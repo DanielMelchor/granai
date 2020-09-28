@@ -344,6 +344,7 @@ Route::group(['prefix' => 'ventas'], function () {
 	Route::post('factura_renumerar/{factura_id}', 'ventaController@factura_renumerar')->name('factura_renumerar');
 	Route::post('documento_renumera','ventaController@documento_renumerar')->name('documento_renumerar');
 	Route::post('factura_refacturar/{factura_id}', 'ventaController@factura_refacturar')->name('factura_refacturar');
+	Route::post('documento_reFactura','ventaController@documento_refacturar')->name('documento_refacturar');
 	Route::post('nota_debito_grabar','ventaController@nd_store')->name('grabar_nd');
 	Route::post('nota_credito_grabar','ventaController@nc_store')->name('grabar_nc');
 	Route::get('editar_factura/{factura_id}/{admision_id}','ventaController@factura_edit')->name('editar_factura');

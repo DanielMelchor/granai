@@ -13,13 +13,6 @@
 @endsection
 
 @section('contenido')
-    @if(Session::has('message'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" arial-label="Close"><span aria-hidden="true">x</span>
-            </button>
-            {{ Session::get('message') }}  
-        </div>
-    @endif
     <div class="row">
         <div class="col">
             @if($errors->any())
@@ -45,110 +38,97 @@
                 </div>
             </div>
             <div class="card-body">
-                <ul class="nav nav-pills ml-auto p-2">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#resumen" data-toggle="tab">Resumen</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#recibos" data-toggle="tab">Recibos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#facturas" data-toggle="tab">Facturas</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="resumen">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card card-secondary">
-                                    <div class="card-header text-center">
-                                        <strong>Parámetros</strong>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-10 offset-md-1">
-                                            <div class="input-group input-group-sm mb-1">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon1">Fecha</span>
-                                                </div>
-                                                <input type="date" class="form-control" id="fecha" name="fecha" value="{{ $hoy }}" style="text-align: center;">
-                                            </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card card-secondary">
+                            <div class="card-header text-center">
+                                <strong>Parámetros</strong>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1">
+                                    <div class="input-group input-group-sm mb-1">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Fecha</span>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-10 offset-md-1">
-                                            <div class="input-group input-group-sm mb-1">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="caja_id">Caja</span>
-                                                </div>
-                                                <select class="custom-select custom-select-sm select2 select2bs4" id="caja_id"  name="caja_id">
-                                                    <option value="0"> Todas </option>
-                                                    @foreach($cajas as $c)
-                                                        <option value="{{ $c->id }}" @if($caja->id == $c->id) selected @endif> {{ $c->nombre_maquina }} </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-10 offset-md-1">
-                                            <a href="#" class="btn btn-info btn-block" onclick="fn_trae_totales(); return false;">Buscar</a>
-                                        </div>
+                                        <input type="date" class="form-control" id="fecha" name="fecha" value="{{ $hoy }}" style="text-align: center;">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="row">
-                                    <div class="col-md-10 offset-md-1">
-                                        <div class="card card-secondary">
-                                            <div class="card-header text-center">
-                                                <strong>Documentos</strong>
-                                            </div>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1">
+                                    <div class="input-group input-group-sm mb-1">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" for="caja_id">Caja</span>
                                         </div>
-                                        <div class="card-body">
-                                            <table id="tblResumenDocumentos" class="table table-sm table-bordered">
-                                                <tbody>
-                                                    <tr><td>Factura</td><td style="text-align: right;">0.00</td></tr>
-                                                    <tr><td>Factura Electronica</td><td style="text-align: right;">0.00</td></tr>
-                                                    <tr><td>Nota de Crédito</td><td style="text-align: right;">0.00</td></tr>
-                                                    <tr><td>Nota de Débito</td><td style="text-align: right;">0.00</td></tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr><th>Total</th><td style="text-align: right;">0.00</td></tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="caja_id"  name="caja_id">
+                                            <option value="0"> Todas </option>
+                                            @foreach($cajas as $c)
+                                                <option value="{{ $c->id }}" @if($caja->id == $c->id) selected @endif> {{ $c->nombre_maquina }} </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="row">
-                                    <div class="col-md-10 offset-md-1">
-                                        <div class="card card-secondary">
-                                            <div class="card-header text-center">
-                                                <strong>Formas de Pago</strong>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <table id="tblResumenPago" class="table table-sm table-bordered">
-                                                <tbody>
-                                                    <tr><td>Efectivo</td><td style="text-align: right;">0.00</td></tr>
-                                                    <tr><td>Cheques</td><td style="text-align: right;">0.00</td></tr>
-                                                    <tr><td>Tarjeta de Credito</td><td style="text-align: right;">0.00</td></tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr><th>Total</th><td style="text-align: right;">0.00</td></tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1">
+                                    <a href="#" class="btn btn-info btn-block" onclick="fn_trae_totales(); return false;">Buscar</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="recibos">
-                        <br>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-10 offset-md-1">
+                                <div class="card card-secondary">
+                                    <div class="card-header text-center">
+                                        <strong>Documentos</strong>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <table id="tblResumenDocumentos" class="table table-sm table-bordered">
+                                        <tbody>
+                                            <tr><td>Factura</td><td style="text-align: right;">0.00</td></tr>
+                                            <tr><td>Factura Electronica</td><td style="text-align: right;">0.00</td></tr>
+                                            <tr><td>Nota de Crédito</td><td style="text-align: right;">0.00</td></tr>
+                                            <tr><td>Nota de Débito</td><td style="text-align: right;">0.00</td></tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr><th>Total</th><td style="text-align: right;">0.00</td></tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-10 offset-md-1">
+                                <div class="card card-secondary">
+                                    <div class="card-header text-center">
+                                        <strong>Formas de Pago</strong>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <table id="tblResumenPago" class="table table-sm table-bordered">
+                                        <tbody>
+                                            <tr><td>Efectivo</td><td style="text-align: right;">0.00</td></tr>
+                                            <tr><td>Cheques</td><td style="text-align: right;">0.00</td></tr>
+                                            <tr><td>Tarjeta de Credito</td><td style="text-align: right;">0.00</td></tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr><th>Total</th><td style="text-align: right;">0.00</td></tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
                         <form class="form-horizontal">
                             <div class="row text-center">
                                 <div class="col-md-12">
@@ -168,8 +148,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="tab-pane" id="facturas">
-                        <br>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
                         <form class="form-horizontal">
                             <div class="row text-center">
                                 <div class="col-md-12">

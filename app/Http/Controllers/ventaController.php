@@ -69,6 +69,7 @@ class ventaController extends Controller
                    ->select('md.id', 'td.descripcion as tipo_descripcion', 'md.serie', 'md.correlativo', 'md.fecha_emision', 'md.serie_afecta', 'md.correlativo_afecto', 'md.nit', 'md.nombre', 'md.estado', DB::raw('(CASE WHEN md.estado = "A" THEN "Vigente" ELSE "Anulada" END) AS estado_descripcion'), DB::raw('SUM(dd.precio_neto) as precio_neto'))
                    ->groupBy('md.id', 'td.descripcion', 'md.serie', 'md.correlativo', 'md.fecha_emision', 'md.serie_afecta', 'md.correlativo_afecto', 'md.nit', 'md.nombre', 'md.estado')
                    ->get();
+        //dd($listado);
         return view('ventas.nd_index', compact('listado'));
     }
 
@@ -363,7 +364,7 @@ class ventaController extends Controller
         $detalle_original = DB::table('pago_documentos as pd')
                             ->join('maestro_documentos as md', 'pd.maestro_documento_id', 'md.id')
                             ->join('detalle_documentos as dd', 'md.id', 'dd.maestro_documento_id')
-                            ->where('pd.id', $recibo_id)
+                            ->where('pd.maestro_pago_id', $recibo_id)
                             ->select('dd.admision_cargo_detalle_id', 'dd.producto_id', 'dd.descripcion', 'dd.cantidad', 'dd.precio_unitario', 'dd.precio_bruto', 'dd.descuento', 'dd.recargo', 'dd.precio_neto', 'dd.precio_base', 'dd.precio_impuesto')
                             ->get();
 
@@ -417,7 +418,7 @@ class ventaController extends Controller
         $marcar_cheque->estado = 'R';
         $marcar_cheque->save();
 
-        $respuesta = 'Nota de Débito '.$serie.'-'.$correlativo.' Grabada con exito !!!';
+        $respuesta = array('parametro' => 0,'respuesta' => 'Nota de Debito '.$serie.'-'.$correlativo.' Grabada con exito !!!', 'nd_id' => $maestro->id);
 
         return Response::json($respuesta);
     }
@@ -583,7 +584,11 @@ class ventaController extends Controller
         $serie            = strtoupper($_POST['serie']);
         $correlativo      = $_POST['correlativo'];
 
-        $existe = maestro_documento::where('empresa_id', Auth::user()->empresa_id)->where('serie', $serie)->where('correlativo', $correlativo)->count();
+        $existe = maestro_documento::where('empresa_id', Auth::user()->empresa_id)
+                  ->where('serie', $serie)
+                  ->where('correlativo', $correlativo)
+                  ->where('estado', 'A')
+                  ->count();
 
         if ($existe > 0) {
             $encabezado = DB::table('maestro_documentos as md')
@@ -755,6 +760,111 @@ class ventaController extends Controller
 
     }
 
+    public function documento_refacturar(){
+        $documento_id      = $_POST['documento_id'];
+
+        $paciente_id       = $_POST['paciente_id'];
+        $tipodocumento_id  = $_POST['tipodocumento_id'];
+        $nueva_fecha       = $_POST['nueva_fecha'];
+        $nueva_serie       = strtoupper($_POST['nueva_serie']);
+        $nuevo_correlativo = $_POST['nuevo_correlativo'];
+        $nueva_condicion   = $_POST['nueva_condicion'];
+        $nuevo_nit         = $_POST['nuevo_nit'];
+        $nuevo_nombre      = $_POST['nuevo_nombre'];
+        $nueva_direccion   = $_POST['nueva_direccion'];
+        $motivo_id         = $_POST['motivo_id'];
+        $observaciones     = $_POST['observaciones'];
+
+        $tipo_documento = Tipo_documento::findOrFail($tipodocumento_id);
+        $caja_id        = Auth::user()->caja_id;
+        $caja           = Caja::findOrFail($caja_id);
+        $resolucion     = Resolucion::where('tipo_documento', $tipodocumento_id)
+                          ->where('estado', 'A')
+                          ->where('caja_id', $caja_id)
+                          ->where('serie', $nueva_serie)
+                          ->where('correlativo_inicial' ,'<=', $nuevo_correlativo)
+                          ->where('correlativo_final' ,'>=', $nuevo_correlativo)
+                          ->first();
+
+        $Existe = maestro_documento::where('empresa_id', Auth::user()->empresa_id)
+                  ->where('serie', $nueva_serie)
+                  ->where('correlativo', $nuevo_correlativo)->count();
+
+        $facturaAnterior = maestro_documento::findOrFail($documento_id);
+
+        //$respuesta = array('parametro' => 0, 'respuesta' => $documento_id);
+        if ($Existe == 0) {
+            if (!empty($resolucion)) {
+                $factura = new maestro_documento();
+                $factura->empresa_id = Auth::user()->empresa_id;
+                $factura->caja_id    = Auth::user()->caja_id;
+                $factura->paciente_id      = $paciente_id;
+                $factura->tipodocumento_id = $tipodocumento_id;
+                $factura->resolucion_id    = $resolucion->id;
+                $factura->fecha_emision    = $nueva_fecha;
+                $factura->serie            = $nueva_serie;
+                $factura->correlativo      = $nuevo_correlativo;
+                $factura->condicion        = $nueva_condicion;
+                $factura->nit              = $nuevo_nit;
+                $factura->nombre           = $nuevo_nombre;
+                $factura->direccion        = $nueva_direccion;
+                $factura->estado           = 'A';
+                $factura->tipodocumentoafecto_id = $facturaAnterior->tipodocumentoafecto_id;
+                $factura->serie_afecta           = $facturaAnterior->serie_afecta;
+                $factura->correlativo_afecto     = $facturaAnterior->correlativo_afecto;
+                $factura->save();
+
+                //Actualiza la resolucion
+                $factura_resolucion = Resolucion::findOrFail($resolucion->id);
+                $factura_resolucion->ultimo_correlativo = $nuevo_correlativo;
+                $factura_resolucion->save();
+
+                $detalles = detalle_documento::where('maestro_documento_id', $documento_id)->get();
+
+                foreach ($detalles as $d) {
+                    $detalle = new detalle_documento();
+                    $detalle->maestro_documento_id      = $factura->id;
+                    $detalle->admision_cargo_detalle_id = $d->admision_cargo_detalle_id;
+                    $detalle->producto_id               = $d->producto_id;
+                    $detalle->descripcion               = $d->descripcion;
+                    $detalle->signo                     = $tipo_documento->signo;
+                    $detalle->cantidad                  = $d->cantidad;
+                    $detalle->precio_unitario           = $d->precio_unitario;
+                    $detalle->precio_bruto              = $d->precio_bruto;
+                    $detalle->descuento                 = $d->descuento;
+                    $detalle->recargo                   = $d->recargo;
+                    $detalle->precio_neto               = $d->precio_neto;
+                    $detalle->precio_base               = $d->precio_base;
+                    $detalle->precio_impuesto           = $d->precio_impuesto;
+                    $detalle->estado                    = $d->estado;
+                    $detalle->save();
+                }
+
+                $pagos = pago_documento::where('maestro_documento_id', $documento_id)->get();
+
+                foreach ($pagos as $p) {
+                    $pago = new pago_documento();
+                    $pago->maestro_documento_id = $factura->id;
+                    $pago->maestro_pago_id      = $p->maestro_pago_id;
+                    $pago->saldo_documento      = $p->saldo_documento;
+                    $pago->total_aplicado       = $p->total_aplicado;
+                    $pago->estado               = $p->estado;
+                    $pago->save();
+                }
+
+
+                $respuesta = array('parametro' => 0, 'respuesta' => $tipo_documento->descripcon.' '.$factura->serie.'-'.$factura->correlativo.' Guardada con exito', 'id' => $factura->id);
+            }else{
+                $respuesta = array('parametro' => 1, 'respuesta' => $caja->nombre_maquina.' No cuenta con una resolucion activa que permita emitir el documento, favor Verifique');
+            }
+        } else{
+            $respuesta = array('parametro' => 1, 'respuesta' => $tipo_documento->descripcion.' '.$nueva_serie.'-'.$nuevo_correlativo.' Ya se encuentra guardada en nuestros registros, Favor verifique');
+        }
+
+        //$respuesta = array('parametro' => 0, 'respuesta' => $Existe);
+        return Response::json($respuesta);
+    }
+
     public function corte_idx(){
         $listado = DB::table('cortes as c')
                    ->join('maestro_documentos as md', 'c.id', 'md.corte_id')
@@ -893,7 +1003,7 @@ class ventaController extends Controller
                          ->select(DB::raw('SUM(IFNULL(vvd.total_documento,0)) as total'))
                          ->first();
 
-        /*$resumenp = DB::table('formas_pago as fp')
+        $resumenp = DB::table('formas_pago as fp')
                     ->distinct()
                     ->leftjoin('vw_forma_pago_documentos as vfpd', function($join) use($id){
                          $join->on('fp.id', 'vfpd.forma_pago')
@@ -902,20 +1012,23 @@ class ventaController extends Controller
                     })
                     ->groupBy('fp.id', 'fp.descripcion')
                     ->select('fp.id', 'fp.descripcion', DB::raw('SUM(IFNULL(vfpd.total_forma_pago,0)) as total'))
-                    ->get();*/
+                    ->get();
         //dd($resumenp);
 
         $documentos = DB::table('vw_venta_documentos as vvd')
                       ->where('vvd.empresa_id', Auth::user()->empresa_id)
                       ->where('vvd.corte_id', $id)
-                      ->select(DB::raw('SUM(vvd.total_documento) as total'))
-                      ->first();
+                      ->select('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre',DB::raw('SUM(vvd.total_documento) as total_documento'))
+                      ->groupBy('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre')
+                      ->get();
 
         $pagos = DB::table('vw_corte_caja_recibos as vvcr')
                  ->where('vvcr.empresa_id', Auth::user()->empresa_id)
                  ->where('vvcr.corte_id', $id)
                  ->get();
 
-        return view('ventas.corte_edit', compact('corte', 'documentos', 'pagos', 'caja', 'resumend', 'totalresumend'));
+        //dd($documentos);
+
+        return view('ventas.corte_edit', compact('corte', 'documentos', 'pagos', 'caja', 'resumend', 'resumenp', 'totalresumend'));
     }
 }

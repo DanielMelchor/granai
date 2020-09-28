@@ -18,10 +18,8 @@ class BancoController extends Controller
     
     public function index()
     {
-        $pBancos = banco::all();
-        return view('bancos.index', [
-            'pBancos' => $pBancos
-        ]);
+        $pBancos = banco::paginate(15);
+        return view('bancos.index', compact('pBancos'));
     }
 
     public function create(){

@@ -27,12 +27,12 @@
             @endif
         </div>
     </div>
-    <form role="form" onsubmit="fn_grabar_nd();">
+    <form class="form-horizontal" id="ndForm" name="ndForm" action="#">
         <div class="card card-navy">
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-2 offset-md-10" style="text-align: right;">
-                        <button type="submit" class="btn btn-sm btn-success" title="Grabar"><i class="fas fa-save"></i></button>
+                        <button class="btn btn-sm btn-success"><i class="fas fa-save" title="Guardar"></i></button>
                         <!--<a href="{{ route('nd_listado') }}" class="btn btn-sm btn-danger" title="Regresar a lista de notas de debito"><i class="fas fa-sign-out-alt"></i></a>-->
                         <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de Admisiones" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
                     </div>
@@ -273,7 +273,7 @@
                         /*$('.modal_texto').html(info.mensaje);
                         $("#mensajeModal").modal('show');*/
                     }else{
-                        document.getElementById('recibo_id').value = info['encabezado']['id'];
+                        document.getElementById('recibo_id').value = info['encabezado']['recibo_id'];
                         document.getElementById('paciente_id').value = info['encabezado']['paciente_id'];
                         document.getElementById('paciente_nombre').value = info['encabezado']['nombre_completo'];
 
@@ -386,61 +386,6 @@
             $('#tblFactura tbody').append(html);
         }
 
-        //=========================================================================
-        // Grabar nota de debito
-        //=========================================================================
-
-        function fn_grabar_nd(){
-            var tipo_documento_id = document.getElementById('tipo_documento_id').value;
-            var resolucion_id     = document.getElementById('resolucion_id').value;
-            var fecha_emision     = document.getElementById('fecha_emision').value;
-            var serie             = document.getElementById('serie').value;
-            var correlativo       = document.getElementById('correlativo').value;
-            var banco_id          = document.getElementById('banco_id').value;
-            var cheque_no         = document.getElementById('cheque').value;
-            var paciente_id       = document.getElementById('paciente_id').value;
-            var motivo_id         = document.getElementById('motivo_id').value;
-            var otros_cobros      = document.getElementById('otros_cobros').value;
-            var observaciones     = document.getElementById('observacion_anulacion').value;
-            var nit               = document.getElementById('nit').value;
-            var nombre            = document.getElementById('nombre').value;
-            var direccion         = document.getElementById('direccion').value;
-            var recibo_id         = document.getElementById('recibo_id').value;
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: "{{route('grabar_nd')}}",
-                method: "POST",
-                data: {tipo_documento_id : tipo_documento_id,
-                       resolucion_id     : resolucion_id,
-                       fecha_emision     : fecha_emision,
-                       serie             : serie, 
-                       correlativo       : correlativo,
-                       banco_id          : banco_id,
-                       cheque_no         : cheque_no,
-                       paciente_id       : paciente_id,
-                       motivo_id         : motivo_id,
-                       otros_cobros      : otros_cobros,
-                       observaciones     : observaciones,
-                       nit               : nit,
-                       nombre            : nombre,
-                       direccion         : direccion,
-                       recibo_id         : recibo_id
-                },
-                success: function(response){
-                    var info = response;
-                    console.log(info);
-                    alert('revisar');
-                    /*$('.modal_texto').html(info.respuesta);
-                    $("#mensajeModal").modal('show');*/
-                },
-                error: function(error){
-                    console.log(error);
-                }
-            });
-        }
-
         function cerrar_modal(modal){
             swal({
                 title: 'Confirmación',
@@ -483,6 +428,76 @@
                 }
             );
         }
+
+        //=========================================================================
+        // Grabar nota de debito
+        //=========================================================================
+        $(function(){
+            $("#ndForm").submit(function(){
+                var tipo_documento_id = document.getElementById('tipo_documento_id').value;
+                var resolucion_id     = document.getElementById('resolucion_id').value;
+                var fecha_emision     = document.getElementById('fecha_emision').value;
+                var serie             = document.getElementById('serie').value;
+                var correlativo       = document.getElementById('correlativo').value;
+                var banco_id          = document.getElementById('banco_id').value;
+                var cheque_no         = document.getElementById('cheque').value;
+                var paciente_id       = document.getElementById('paciente_id').value;
+                var motivo_id         = document.getElementById('motivo_id').value;
+                var otros_cobros      = document.getElementById('otros_cobros').value;
+                var observaciones     = document.getElementById('observacion_anulacion').value;
+                var nit               = document.getElementById('nit').value;
+                var nombre            = document.getElementById('nombre').value;
+                var direccion         = document.getElementById('direccion').value;
+                var recibo_id         = document.getElementById('recibo_id').value;
+
+
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('grabar_nd')}}",
+                    method: "POST",
+                    data: {tipo_documento_id : tipo_documento_id,
+                           resolucion_id     : resolucion_id,
+                           fecha_emision     : fecha_emision,
+                           serie             : serie, 
+                           correlativo       : correlativo,
+                           banco_id          : banco_id,
+                           cheque_no         : cheque_no,
+                           paciente_id       : paciente_id,
+                           motivo_id         : motivo_id,
+                           otros_cobros      : otros_cobros,
+                           observaciones     : observaciones,
+                           nit               : nit,
+                           nombre            : nombre,
+                           direccion         : direccion,
+                           recibo_id         : recibo_id
+                    },
+                    success: function(response){
+                        if (response.parametro == 0) {
+                            swal({
+                                title: 'Trabajo Finalizado',
+                                text: response.respuesta,
+                                type: 'success',
+                            }, function(){
+                                //location.reload();
+                                window.location.href = "http://localhost:8888/granai/public/ventas/nota_credito_editar/"+response.nd_id+"?0";
+                            });
+                        }else{
+                            swal({
+                                title: 'Error !!!',
+                                text: response.respuesta,
+                                type: 'error'
+                            });
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });     
+                return false;
+            });
+        });
 
     </script>
 @endsection

@@ -167,7 +167,7 @@ class pagoController extends Controller
                           ->where('mp.empresa_id', Auth::user()->empresa_id)
                           ->where('dp.banco_id', $banco_id)
                           ->where('dp.documento_no', $cheque)
-                          ->select('mp.id', 'mp.serie', 'mp.correlativo', 'mp.fecha_emision', 'p.nombre_completo', DB::raw('SUM(dp.monto) as total'), 'p.id as paciente_id')
+                          ->select('mp.id as recibo_id', 'mp.serie', 'mp.correlativo', 'mp.fecha_emision', 'p.nombre_completo', DB::raw('SUM(dp.monto) as total'), 'p.id as paciente_id')
                           ->groupBy('mp.id', 'mp.serie', 'mp.correlativo', 'mp.fecha_emision', 'p.nombre_completo', 'p.id')
                           ->first();
 
@@ -175,7 +175,7 @@ class pagoController extends Controller
                        ->join('maestro_documentos as md', 'pd.maestro_documento_id', 'md.id')
                        ->join('detalle_documentos as dd', 'md.id', 'dd.maestro_documento_id')
                        ->join('tipo_documentos as td', 'md.tipodocumento_id', 'td.id')
-                       ->where('pd.maestro_pago_id', $encabezado->id)
+                       ->where('pd.maestro_pago_id', $encabezado->recibo_id)
                        ->groupBy('md.id','td.descripcion', 'md.serie', 'md.correlativo', 'md.fecha_emision', 'md.nit', 'md.nombre', 'md.direccion')
                        ->select('md.id as factura_id', 'td.descripcion', 'md.serie', 'md.correlativo', 'md.fecha_emision', 'md.nit', 'md.nombre', 'md.direccion')
                        ->get();

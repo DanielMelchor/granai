@@ -13,13 +13,6 @@
 @endsection
 
 @section('contenido')
-	@if(Session::has('message'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" arial-label="Close"><span aria-hidden="true">x</span>
-            </button>
-            {{ Session::get('message') }}  
-        </div>
-    @endif
     <div class="row">
         <div class="col">
             @if($errors->any())
@@ -59,6 +52,7 @@
                 <input type="hidden" id="factura_estado" name="factura_estado" value="{{ $encabezado->estado }}">
                 <input type="hidden" id="admision_id" name="admision_id" value="{{ $admision_id }}">
                 <input type="hidden" id="caja_editar_documento" name="caja_editar_documento" value="{{ $caja->editar_documento}}">
+                <input type="hidden" id="condicion" name="condicion" value="{{ $encabezado->condicion }}">
                 <div class="row">
                     <div class="col-md-9">
                         <div class="row">
@@ -239,7 +233,7 @@
     <div class="modal fade" id="refacturaModal" tabindex="-1" role="dialog" aria-labelledby="refacturaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form role="form" method="POST" action="{{ route('factura_refacturar', $encabezado->id) }}">
+                <form class="form-horizontal" id="refacturaForm" name="refacturaForm" action="#">
                     @csrf
                     <div class="card card-navy">
                         <div class="card-header">
@@ -270,7 +264,7 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text">Serie</label>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_serie" name="refactura_serie" value="{{ $encabezado->serie }}" required>
+                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_serie" name="refactura_serie" value="{{ $encabezado->serie }}" onchange="fn_resolucion_x_serie(); return false;" required>
                                     </div>
                                 </div>
                             </div>
@@ -349,7 +343,7 @@
     <div class="modal fade" id="renumeraModal" tabindex="-1" role="dialog" aria-labelledby="renumeraModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form class="form-horizontal" id="refacturaForm" name="refacturaForm" action="#">
+                <form class="form-horizontal" id="renumeraForm" name="renumeraForm" action="#">
                     @csrf
                     <div class="card card-navy">
                         <div class="card-header">
@@ -485,7 +479,40 @@
         }
 
         function fn_refacturar(){
-            var factura_id = document.getElementById('factura_id').value;
+            /*=================================================================
+            Verifica si el usuario puede modificar el numero de serie y correlativo
+            de factura
+            =================================================================*/
+            var caja_id               = document.getElementById('caja_id').value;
+            var admision_id           = document.getElementById('admision_id').value;
+            var caja_editar_documento = document.getElementById('caja_editar_documento').value;
+            var tipo_documento_id     = document.getElementById('tipo_documento_id').value;
+
+            if (caja_editar_documento == 'N') {
+                document.getElementById('refactura_serie').disabled = true;
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('resolucion_factura_x_caja')}}",
+                    method: "POST",
+                    data: { caja_id  : caja_id,
+                            tipo_documento_id : tipo_documento_id},
+                    success: function(response){
+                        var info = response;
+                        document.getElementById('resolucion_id').value = info.resolucion_id;
+                        document.getElementById('refactura_serie').value = info.serie;
+                        //document.getElementById('correlativo').value = info.correlativo;
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            }else {
+                document.getElementById('refactura_serie').disabled = false;
+                document.getElementById('refactura_serie').focus();
+            }
+
             $("#refacturaModal").modal('show');
         }
 
@@ -611,7 +638,7 @@
 
         // cambio de correlativo
         $(function(){
-            $("#refacturaForm").submit(function(){
+            $("#renumeraForm").submit(function(){
                 var documento_id      = document.getElementById('factura_id').value;
                 var tipodocumento_id  = document.getElementById('tipo_documento_id').value;
                 var nueva_serie       = document.getElementById('renumera_serie').value;
@@ -636,6 +663,67 @@
                                 type: 'success',
                             }, function(){
                                 location.reload();
+                            });
+                        }else{
+                            swal({
+                                title: 'Error !!!',
+                                text: response.respuesta,
+                                type: 'error'
+                            });
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });     
+                return false;
+            });
+        });
+
+        // re facturacion
+        $(function(){
+            $("#refacturaForm").submit(function(){
+                var documento_id      = document.getElementById('factura_id').value;
+                var paciente_id       = document.getElementById('paciente_id').value;
+                var tipodocumento_id  = document.getElementById('tipo_documento_id').value;
+                var nueva_fecha       = document.getElementById('refactura_fecha_emision').value;
+                var nueva_serie       = document.getElementById('refactura_serie').value;
+                var nuevo_correlativo = document.getElementById('refactura_correlativo').value;
+                var nueva_condicion   = document.getElementById('condicion').value;
+                var nuevo_nit         = document.getElementById('refactura_nit').value;
+                var nuevo_nombre      = document.getElementById('refactura_nombre').value;
+                var nueva_direccion   = document.getElementById('refactura_direccion').value;
+                var motivo_id         = document.getElementById('refactura_motivo_id').value;
+                var observaciones     = document.getElementById('observacion_refactura').value;
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('documento_refacturar')}}",
+                    method: "POST",
+                    data: { documento_id      : documento_id,
+                            paciente_id       : paciente_id,
+                            tipodocumento_id  : tipodocumento_id,
+                            nueva_fecha       : nueva_fecha,
+                            nueva_serie       : nueva_serie,
+                            nuevo_correlativo : nuevo_correlativo,
+                            nueva_condicion   : nueva_condicion,
+                            nuevo_nit         : nuevo_nit,
+                            nuevo_nombre      : nuevo_nombre,
+                            nueva_direccion   : nueva_direccion,
+                            motivo_id         : motivo_id,
+                            observaciones     : observaciones
+                        },
+                    success: function(response){
+                        if (response.parametro == 0) {
+                            var ruta = "http://localhost:8888/granai/public/ventas/editar_factura/"+response.id+"/0";
+                            swal({
+                                title: 'Trabajo Finalizado',
+                                text: response.respuesta,
+                                type: 'success',
+                            }, function(){
+                                window.location.href = ruta;
                             });
                         }else{
                             swal({

@@ -35,6 +35,7 @@
                     @if( $encabezado->estado == 'A')
                         <a href="#" onclick="fn_anular(); return false;" class="btn btn-sm btn-anular" title="Anular Factura"><i class="fas fa-ban"></i></a>
                         <a href="#" onclick="fn_renumerar(); return false;" class="btn btn-sm btn-renumera" title="Cambio de correlativo"><i class="fa fa-edit"></i></a>
+                        <a href="#" onclick="fn_refacturar(); return false;" class="btn btn-sm btn-refactura" title="Re facturar"><i class="far fa-clone"></i></a>
                     @endif
                     <!--<a href="#" onclick="fn_salir(); return false;" class="btn btn-sm btn-danger" title="Regresar a lista de Documentos"><i class="fas fa-sign-out-alt"></i></a>-->
                     <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de documentos" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
@@ -49,73 +50,98 @@
                 <input type="hidden" id="documento_id" name="documento_id" value="{{ $encabezado->id }}">
                 <input type="hidden" id="nc_estado" name="nc_estado">
                 <input type="hidden" id="caja_editar_documento" name="caja_editar_documento" value="{{ $caja->editar_documento}}">
+                <input type="hidden" id="condicion" name="condicion" value="{{ $encabezado->condicion }}">
                 <div class="row">
-                    <div class="col-md-3 offset-md-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Documento</label>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-3 offset-md-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Documento</label>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center" id="documento_descripcion" name="documento_descripcion" value="{{ $documento->descripcion }}" disabled>
+                                </div>
                             </div>
-                            <input type="text" class="form-control form-control-sm text-center" id="documento_descripcion" name="documento_descripcion" value="{{ $documento->descripcion }}" disabled>
+                            <div class="mb-1 col-md-5">
+                                <div class="form-group form-control-sm clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="factura" name="tipodocumento" value="1"  @if($encabezado->tipodocumentoafecto_id == 1) then checked @endif disabled>
+                                        <label for="factura">Factura</label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="Debito" name="tipodocumento" value="3" @if($encabezado->tipodocumentoafecto_id == 3) then checked @endif disabled>
+                                        <label for="Debito">Nota de Debito</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 offset-md-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Fecha</label>
+                                    </div>
+                                    <input type="date" class="form-control form-control-sm text-center" id="fecha_emision" name="fecha_emision" value="{{ $encabezado->fecha_emision }}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Serie</label>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center" id="serie_afecta" name="serie_afecta" style="text-transform: uppercase;" value="{{ $encabezado->serie_afecta }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 offset-md-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Serie</label>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center" id="serie" name="serie" style="text-transform: uppercase;" value="{{ $encabezado->serie }}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Correlativo</label>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center" id="documento_afecto" name="documento_afecto" value="{{ $encabezado->correlativo_afecto }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 offset-md-1">
+                                <div class="input-group mb-1 input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Correlativo</label>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center" id="correlativo" name="correlativo" value="{{ $encabezado->correlativo }}" disabled>
+                                </div>
+                            </div>
+                        </div>>
+                    </div>
+                    @if( $encabezado->estado == 'I')
+                    <div class="col-md-3">
+                        <div class="card card-danger">
+                            <div class="card-header text-center">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6>Motivo Anulación</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-10 offset-md-1">
+                                        <span>{{ $encabezado->observacion_anulacion }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-1 col-md-5">
-                        <div class="form-group form-control-sm clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="factura" name="tipodocumento" value="1"  @if($encabezado->tipodocumentoafecto_id == 1) then checked @endif disabled>
-                                <label for="factura">Factura</label>
-                            </div>
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="Debito" name="tipodocumento" value="3" @if($encabezado->tipodocumentoafecto_id == 3) then checked @endif disabled>
-                                <label for="Debito">Nota de Debito</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 offset-md-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Fecha</label>
-                            </div>
-                            <input type="date" class="form-control form-control-sm text-center" id="fecha_emision" name="fecha_emision" value="{{ $encabezado->fecha_emision }}" disabled>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Serie</label>
-                            </div>
-                            <input type="text" class="form-control form-control-sm text-center" id="serie_afecta" name="serie_afecta" style="text-transform: uppercase;" value="{{ $encabezado->serie_afecta }}" disabled>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 offset-md-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Serie</label>
-                            </div>
-                            <input type="text" class="form-control form-control-sm text-center" id="serie" name="serie" style="text-transform: uppercase;" value="{{ $encabezado->serie }}" disabled>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Correlativo</label>
-                            </div>
-                            <input type="text" class="form-control form-control-sm text-center" id="documento_afecto" name="documento_afecto" value="{{ $encabezado->correlativo_afecto }}" disabled>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 offset-md-1">
-                        <div class="input-group mb-1 input-group-sm">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text">Correlativo</label>
-                            </div>
-                            <input type="text" class="form-control form-control-sm text-center" id="correlativo" name="correlativo" value="{{ $encabezado->correlativo }}" disabled>
-                        </div>
-                    </div>
+                    @endif
                 </div>
                 <hr>
                 <div class="row">
@@ -431,7 +457,7 @@
     <div class="modal fade" id="renumeraModal" tabindex="-1" role="dialog" aria-labelledby="renumeraModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form class="form-horizontal" id="refacturaForm" name="refacturaForm" action="#">
+                <form class="form-horizontal" id="renumeraForm" name="renumeraForm" action="#">
                     @csrf
                     <div class="card card-navy">
                         <div class="card-header">
@@ -472,6 +498,115 @@
         </div>
     </div>
     <!-- /cambio de correlativo -->
+    <!-- re facturacion -->
+    <div class="modal fade" id="refacturaModal" tabindex="-1" role="dialog" aria-labelledby="refacturaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" id="refacturaForm" name="refacturaForm" action="#">
+                    @csrf
+                    <div class="card card-navy">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6>Re Facturación</h6>
+                                </div>
+                                <div class="col-md-4" style="text-align: right;">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Grabar"><i class="fas fa-save"></i></button>
+                                    <!--<a href="#" class="btn btn-sm btn-danger" title="Regresar a documento" data-dismiss="modal"><i class="fas fa-sign-out-alt"></i></a>-->
+                                    <button type="button" class="btn btn-sm btn-danger" title="Salir" onclick="cerrar_modal('refacturaModal'); return false;"><i class="fas fa-sign-out-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">Fecha</label>
+                                        </div>
+                                        <input type="date" class="form-control form-control-sm text-center" id="refactura_fecha_emision" name="refactura_fecha_emision" value="{{ $hoy }}" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">Serie</label>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_serie" name="refactura_serie" value="{{ $encabezado->serie }}" onchange="fn_resolucion_x_serie(); return false;" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">Correlativo</label>
+                                        </div>
+                                        <input type="number" class="form-control form-control-sm text-center" id="refactura_correlativo" name="refactura_correlativo" value="{{ $encabezado->correlativo }}"  required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">N.I.T.</label>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_nit" name="refactura_nit" value="{{ $encabezado->nit }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">Nombre</label>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_nombre" name="refactura_nombre" value="{{ $encabezado->nombre }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group mb-1 input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text">Dirección</label>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center" id="refactura_direccion" name="refactura_direccion" value="{{ $encabezado->direccion }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="refactura_motivo_id">Motivo</label>
+                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="refactura_motivo_id"  name="refactura_motivo_id" autofocus required>
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($listado as $l)
+                                                <option value="{{ $l->id}}">{{ $l->descripcion }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 offset-md-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Observaciones</span>
+                                        </div>
+                                        <textarea class="form-control form-control-sm" aria-label="With textarea" id="observacion_refactura" name="observacion_refactura" rows="3" maxlength="150" style="text-align: justify;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- /re facturacion -->
 @endsection
 @section('js')
     <link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -936,7 +1071,7 @@
 
         // cambio de correlativo
         $(function(){
-            $("#refacturaForm").submit(function(){
+            $("#renumeraForm").submit(function(){
                 var documento_id      = document.getElementById('documento_id').value;
                 var tipodocumento_id  = document.getElementById('tipo_documento_id').value;
                 var nueva_serie       = document.getElementById('renumera_serie').value;
@@ -961,6 +1096,106 @@
                                 type: 'success',
                             }, function(){
                                 location.reload();
+                            });
+                        }else{
+                            swal({
+                                title: 'Error !!!',
+                                text: response.respuesta,
+                                type: 'error'
+                            });
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });     
+                return false;
+            });
+        });
+
+        function fn_refacturar(){
+            /*=================================================================
+            Verifica si el usuario puede modificar el numero de serie y correlativo
+            de factura
+            =================================================================*/
+            var caja_id               = document.getElementById('caja_id').value;
+            var caja_editar_documento = document.getElementById('caja_editar_documento').value;
+            var tipo_documento_id     = document.getElementById('tipo_documento_id').value;
+
+            if (caja_editar_documento == 'N') {
+                document.getElementById('refactura_serie').disabled = true;
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('resolucion_factura_x_caja')}}",
+                    method: "POST",
+                    data: { caja_id  : caja_id,
+                            tipo_documento_id : tipo_documento_id},
+                    success: function(response){
+                        var info = response;
+                        document.getElementById('resolucion_id').value = info.resolucion_id;
+                        document.getElementById('refactura_serie').value = info.serie;
+                        //document.getElementById('correlativo').value = info.correlativo;
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            }else {
+                document.getElementById('refactura_serie').disabled = false;
+                document.getElementById('refactura_serie').focus();
+            }
+
+            $("#refacturaModal").modal('show');
+        }
+
+        // re facturacion
+        $(function(){
+            $("#refacturaForm").submit(function(){
+                var documento_id      = document.getElementById('documento_id').value;
+                var paciente_id       = document.getElementById('paciente_id').value;
+                var tipodocumento_id  = document.getElementById('tipo_documento_id').value;
+                var nueva_fecha       = document.getElementById('refactura_fecha_emision').value;
+                var nueva_serie       = document.getElementById('refactura_serie').value;
+                var nuevo_correlativo = document.getElementById('refactura_correlativo').value;
+                var nueva_condicion   = document.getElementById('condicion').value;
+                var nuevo_nit         = document.getElementById('refactura_nit').value;
+                var nuevo_nombre      = document.getElementById('refactura_nombre').value;
+                var nueva_direccion   = document.getElementById('refactura_direccion').value;
+                var motivo_id         = document.getElementById('refactura_motivo_id').value;
+                var observaciones     = document.getElementById('observacion_refactura').value;
+
+                alert(tipodocumento_id+' '+nueva_serie+' '+nuevo_correlativo);
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('documento_refacturar')}}",
+                    method: "POST",
+                    data: { documento_id      : documento_id,
+                            paciente_id       : paciente_id,
+                            tipodocumento_id  : tipodocumento_id,
+                            nueva_fecha       : nueva_fecha,
+                            nueva_serie       : nueva_serie,
+                            nuevo_correlativo : nuevo_correlativo,
+                            nueva_condicion   : nueva_condicion,
+                            nuevo_nit         : nuevo_nit,
+                            nuevo_nombre      : nuevo_nombre,
+                            nueva_direccion   : nueva_direccion,
+                            motivo_id         : motivo_id,
+                            observaciones     : observaciones
+                        },
+                    success: function(response){
+                        if (response.parametro == 0) {
+                            var ruta = "http://localhost:8888/granai/public/ventas/nota_credito_editar/"+response.id+"?0";
+                            swal({
+                                title: 'Trabajo Finalizado',
+                                text: response.respuesta,
+                                type: 'success',
+                            }, function(){
+                                window.location.href = ruta;
                             });
                         }else{
                             swal({
