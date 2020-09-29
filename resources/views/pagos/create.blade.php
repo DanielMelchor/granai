@@ -960,7 +960,7 @@
                             var info = response;
                             $('.modal_texto').html(info.respuesta);
                             $("#mensajeModal").modal('show');
-                            window.location.replace("http://localhost:8888/granai/public/pagos/editar_recibo/"+info.recibo_id);
+                            window.location.href = asset+"pagos/editar_recibo/"+info.recibo_id;
                         },
                         error: function(error){
                             console.log(error);

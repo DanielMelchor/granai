@@ -4,9 +4,7 @@
     <div class="row justify-content-center align-items-center vh-100">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">
-                    Login
-                </div>
+                <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
                     <div class="row text-center">
@@ -19,6 +17,7 @@
                         @csrf
                         <div class="form-group row">
                             <!--<label for="username" class="col-md-4 col-form-label text-md-right">Usuario</label>-->
+                            <!--<label for="username" class="col-md-1 col-form-label text-md-right">{{ __('user') }}</label>-->
 
                             <div class="col-md-10 offset-md-1">
                                 <input id="username" type="username" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" placeholder="Usuario" autofocus>
@@ -35,6 +34,7 @@
                             <!--<label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>-->
 
                             <div class="col-md-10 offset-md-1">
+                                <!--<label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>-->
                                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required placeholder="contraseña" autocomplete="current-password">
 
                                 @error('password')
@@ -51,8 +51,8 @@
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
                                     <label class="form-check-label" for="remember">
-                                        <!--{{ __('Remember Me') }} -->
-                                        {{ __('Recordarme') }}
+                                        {{ __('Remember Me') }}
+                                        <!--{{ __('Recordarme') }}-->
                                     </label>
                                 </div>
                             </div>
@@ -61,7 +61,8 @@
                         <div class="form-group row mb-0">
                             <div class="col-md-10 offset-md-1">
                                 <button type="submit" class="btn btn-primary btn-block">
-                                    <!--{{ __('Login') }}-->{{ __('Ingresar') }}
+                                    {{ __('Login') }}
+                                    <!--{{ __('Ingresar') }}-->
                                 </button>
 
                                 <!--@if (Route::has('password.request'))

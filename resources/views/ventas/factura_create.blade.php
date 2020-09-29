@@ -33,7 +33,6 @@
             <div class="row">
                 <div class="col-md-2 offset-md-10" style="text-align: right;">
                     <a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_grabar_factura(); return false;"><i class="fas fa-save"></i></a>
-                    <!--<a href="#" onclick="fn_salir(); return false;" class="btn btn-sm btn-danger" title="Regresar a lista de Documentos"><i class="fas fa-sign-out-alt"></i></a>-->
                     <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de Admisiones" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </div>
@@ -499,15 +498,6 @@
             });
         }
 
-        function fn_salir(){
-            var admision_id = document.getElementById('admision_id').value;
-            if (admision_id == 0) {
-                window.location.replace("http://localhost:8888/granai/public/ventas/listado");
-            } else {
-                window.location.replace("http://localhost:8888/granai/public/admisiones/editar/"+admision_id);
-            }
-        }
-
         function fn_forma_pago(){
             document.getElementById('fpago_id').selectedIndex = 0;
             $('#fpago_id').change();
@@ -930,11 +920,8 @@
                             text: info.respuesta,
                             type: 'success',
                         }, function(){
-                            window.location.href = "http://localhost:8888/granai/public/ventas/editar_factura/"+info.factura_id+"/0";
+                            window.location.href = asset+"ventas/editar_factura/"+info.factura_id+"/0";
                         });
-                        /*$('.modal_texto').html(info.respuesta);
-                        $("#mensajeModal").modal('show');
-                        window.location.replace("http://localhost:8888/granai/public/ventas/editar_factura/"+info.factura_id+"/0");*/
                     },
                     error: function(error){
                         console.log(error);

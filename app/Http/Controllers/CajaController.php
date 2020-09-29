@@ -207,4 +207,14 @@ class CajaController extends Controller
         }
         return response::json($totalRegistros);
     }
+
+    public function cajas_x_empresa(){
+        $empresa_id = $_POST['empresa_id'];
+
+        $cajas = Caja::where('empresa_id', $empresa_id)
+                 ->where('estado', 'A')
+                 ->get();
+
+        return response::json($cajas);
+    }
 }

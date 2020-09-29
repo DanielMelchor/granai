@@ -38,7 +38,6 @@
                         <a href="#" onclick="fn_renumerar(); return false;" class="btn btn-sm btn-renumera" title="Cambio de correlativo"><i class="fa fa-edit"></i></a>
                         <a href="#" onclick="fn_refacturar(); return false;" class="btn btn-sm btn-refactura" title="Re facturar"><i class="far fa-clone"></i></a>
                     @endif
-                    <!--<a href="#" onclick="fn_salir(); return false;" class="btn btn-sm btn-danger" title="Regresar a lista de Documentos"><i class="fas fa-sign-out-alt"></i></a>-->
                     <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de Admisiones" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </div>
@@ -460,15 +459,6 @@
             var tipo_documento_id     = document.getElementById('tipo_documento_id').value;
         });
 
-        function fn_salir(){
-            var admision_id = document.getElementById('admision_id').value;
-            if (admision_id == 0) {
-                window.location.replace("http://localhost:8888/granai/public/ventas/listado");
-            } else {
-                window.location.replace("http://localhost:8888/granai/public/admisiones/editar/"+admision_id);
-            }
-        }
-
         function fn_anular(){
             var factura_id = document.getElementById('factura_id').value;
             $("#anulacionModal").modal('show');
@@ -717,7 +707,7 @@
                         },
                     success: function(response){
                         if (response.parametro == 0) {
-                            var ruta = "http://localhost:8888/granai/public/ventas/editar_factura/"+response.id+"/0";
+                            var ruta = asset+"ventas/editar_factura/"+response.id+"/0";
                             swal({
                                 title: 'Trabajo Finalizado',
                                 text: response.respuesta,

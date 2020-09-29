@@ -33,7 +33,6 @@
             <div class="row">
                 <div class="col-md-2 offset-md-10" style="text-align: right;">
                     <a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_grabar_nc(); return false;"><i class="fas fa-save"></i></a>
-                    <!--<a href="#" onclick="fn_salir(); return false;" class="btn btn-sm btn-danger" title="Regresar a lista de Documentos"><i class="fas fa-sign-out-alt"></i></a>-->
                     <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de Admisiones" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </div>
@@ -447,10 +446,6 @@
             });
         }
 
-        function fn_salir(){
-            window.location.replace("http://localhost:8888/granai/public/ventas/listado_notas_credito/");
-        }
-
         window.addEventListener('load', function(){
             var local_db = [];
             localStorage.clear(local_db);
@@ -646,7 +641,7 @@
                                 text: info.mensaje,
                                 type: 'success',
                             }, function(){
-                                window.location.href = "http://localhost:8888/granai/public/ventas/nota_credito_editar/"+info.nota_id;
+                                window.location.href = asset+"ventas/nota_credito_editar/"+info.nota_id;
                             });
                         }else {
                             swal({

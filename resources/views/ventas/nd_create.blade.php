@@ -480,8 +480,7 @@
                                 text: response.respuesta,
                                 type: 'success',
                             }, function(){
-                                //location.reload();
-                                window.location.href = "http://localhost:8888/granai/public/ventas/nota_credito_editar/"+response.nd_id+"?0";
+                                window.location.href = asset+"ventas/nota_credito_editar/"+response.nd_id+"?0";
                             });
                         }else{
                             swal({

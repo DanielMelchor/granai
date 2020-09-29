@@ -945,7 +945,7 @@
 
                     document.createElement("buttom").append();
 
-                    document.getElementById("impresion_receta").setAttribute('href','http://localhost:8888/granai/public/admisiones/generar_receta/'+info.id );
+                    document.getElementById("impresion_receta").setAttribute('href', asset+'admisiones/generar_receta/'+info.id );
                     document.getElementById('bmi_show').innerHTML = '<h3>'+parseFloat(info.bmi).toFixed(2)+'</h3>';
                 },
                 error: function(error){
@@ -1001,8 +1001,6 @@
                     document.getElementById("procedimiento_diagnostico").value = info.diagnostico;
                     document.getElementById("procedimiento_recomendacion").value = info.recomendaciones;
 
-                    /*document.getElementById('impresion_informe').setAttribute('href', 'http://localhost:8888/granai/public/admision_procedimientos/informe/'+info.admision_id);*/
-                    
                     document.getElementById("procedimiento_procedimiento_id").disabled = false;
                     document.getElementById("procedimiento_premedicacion").disabled = false;
                     document.getElementById("buena").disabled = false;
@@ -1058,7 +1056,7 @@
                         //$('#tblimagenes tbody').append(html);
                         document.getElementById('mostrar_fotos').innerHTML = html;
 
-                        document.getElementById('informe').setAttribute('href', 'http://localhost:8888/granai/public/admisiones/generar_informe/'+admision_id);
+                        document.getElementById('informe').setAttribute('href', asset+'admisiones/generar_informe/'+admision_id);
                     }else{
                         html += '';
                         document.getElementById('mostrar_fotos').innerHTML = html;

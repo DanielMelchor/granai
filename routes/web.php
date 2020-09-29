@@ -145,6 +145,7 @@ Route::group(['prefix' => 'cajas'], function () {
 	Route::post('resolucion_recibo_x_caja','CajaController@resolucion_recibo_x_caja')->name('resolucion_recibo_x_caja');
 	Route::post('caja_resoluciones','CajaController@caja_resoluciones')->name('caja_resoluciones');
 	Route::post('resolucion_utilizada','CajaController@resolucion_registros_utilizados')->name('resolucion_registros_utilizados');
+	Route::post('cajas_por_empresa','CajaController@cajas_x_empresa')->name('cajas_por_empresa');
 });
 
 Route::group(['prefix' => 'correlativos'], function () {
@@ -371,4 +372,16 @@ Route::group(['prefix' => 'pagos'], function () {
 	Route::post('trae_detalle_recibo', 'pagoController@trae_detalle_recibo')->name('trae_detalle_recibo');
 	Route::post('trae_pago_recibo', 'pagoController@trae_pago_recibo')->name('trae_pago_recibo');
 	Route::post('recibo_anulacion/{recibo_id}','pagoController@recibo_anular')->name('recibo_anular');
+});
+
+Route::group(['prefix' => 'usuarios'], function(){
+	Route::get('listado', 'UsuarioController@index')->name('usuarios');	
+	Route::get('nuevo_usuario', 'UsuarioController@create')->name('crear_usuario');
+	Route::get('editar/{usuario_id}', 'UsuarioController@edit')->name('editar_usuario');
+	Route::post('grabar', 'UsuarioController@store')->name('grabar_usuario');
+	Route::post('actualizar/{usuario_id}', 'UsuarioController@update')->name('actualizar_usuario');
+	/*Route::get('contrasena', 'UsuarioController@index_contrasena')->name('contrasena');	*/
+	Route::get('cambio_clave', 'UsuarioController@edit_clave')->name('cambio_clave');
+	Route::post('actualizar_contrasena', 'UsuarioController@update_contrasena')->name('actualizar_contrasena');
+	Route::get('inicializar_contrasena/{usuario_id}', 'UsuarioController@reset')->name('inicializar_contrasena');
 });

@@ -37,7 +37,6 @@
                         <a href="#" onclick="fn_renumerar(); return false;" class="btn btn-sm btn-renumera" title="Cambio de correlativo"><i class="fa fa-edit"></i></a>
                         <a href="#" onclick="fn_refacturar(); return false;" class="btn btn-sm btn-refactura" title="Re facturar"><i class="far fa-clone"></i></a>
                     @endif
-                    <!--<a href="#" onclick="fn_salir(); return false;" class="btn btn-sm btn-danger" title="Regresar a lista de Documentos"><i class="fas fa-sign-out-alt"></i></a>-->
                     <a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de documentos" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </div>
@@ -699,10 +698,6 @@
             });
         }
 
-        function fn_salir(){
-            window.location.replace("http://localhost:8888/granai/public/ventas/listado_notas_credito/");
-        }
-
         window.addEventListener('load', function(){
             var local_db = [];
             localStorage.clear(local_db);
@@ -1189,7 +1184,7 @@
                         },
                     success: function(response){
                         if (response.parametro == 0) {
-                            var ruta = "http://localhost:8888/granai/public/ventas/nota_credito_editar/"+response.id+"?0";
+                            var ruta = asset+"ventas/nota_credito_editar/"+response.id+"?0";
                             swal({
                                 title: 'Trabajo Finalizado',
                                 text: response.respuesta,

@@ -2,8 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
   <title>Grupo | Amad </title>
@@ -76,7 +77,7 @@
               <ul aria-labelledby="administracionSubMenu" class="dropdown-menu border-0 shadow">
                 <li><a href="{{ route('empresas') }}" class="dropdown-item">Empresas</a></li>
                 <li><a href="#" class="dropdown-item">Roles </a></li>
-                <li><a href="#" class="dropdown-item">Usuarios</a></li>
+                <li><a href="{{ route('usuarios') }}" class="dropdown-item">Usuarios</a></li>
               </ul>
             </li>
             <!-- /administracion -->
@@ -148,6 +149,7 @@
             </a>
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ route('cambio_clave') }}">Cambio de contraseña</a>
                 <a class="dropdown-item" href="{{ route('logout') }}"
                    onclick="event.preventDefault();
                                  document.getElementById('logout-form').submit();">
