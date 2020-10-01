@@ -130,8 +130,6 @@ class AgendaController extends Controller
             'medico_id'   => 'required'
         ]);
 
-        //$fechahora = DateTime($validData['fecha']. " ".$validData['hora'], "Y-m-d H:i:s");
-        //$fechahora = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $validData['fecha']. " ".$validData['hora']);
         $fechahora_inicio = Carbon::createFromFormat('Y-m-d H:i', $validData['fecha_cita']. " ".$validData['hora_inicio'])->toDateTimeString();
         $fechahora_final = Carbon::createFromFormat('Y-m-d H:i', $validData['fecha_cita']. " ".$validData['hora_final'])->toDateTimeString();
 
@@ -142,6 +140,11 @@ class AgendaController extends Controller
         $agenda->fecha_inicio     = $fechahora_inicio;
         $agenda->fecha_final      = $fechahora_final;
         $agenda->nombre_completo  = $validData['nombre_completo'];
+        if (isset($request->paciente_id)) {
+            $agenda->paciente_id  = $request->paciente_id;
+        }else{
+            $agenda->paciente_id  = null;
+        }
         $agenda->telefonos        = $validData['telefonos'];
         $agenda->observaciones    = $request->observaciones;
         $agenda->estado           = 'A';
@@ -149,7 +152,7 @@ class AgendaController extends Controller
 
         //return Redirect::route('nueva_agenda', [$agenda->medico_id, 'T', $validData['fecha_cita']])->with('message','Cita grabada con exito');
         Session::flash('success', 'Cita grabada con exito !!!' );
-        return redirect(route('nueva_agenda', [$agenda->medico_id, 'T', $validData['fecha_cita']]));
+        return redirect(route('nueva_agenda', [$agenda->medico_id, 'A', $validData['fecha_cita']]));
     }
 
     public function nuevo_edit($id){

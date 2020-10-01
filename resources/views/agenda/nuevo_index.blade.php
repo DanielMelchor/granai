@@ -2,6 +2,7 @@
 
 @section('css')
 	<script src="{{ asset('assets/adminlte/plugins/moment/moment.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 	<style>
@@ -157,12 +158,27 @@
 			                            <input type="time" class="form-control" id="hora_final" name="hora_final" required value="{{ old('hora_final') }}">
 			                        </div>
 			      				</div>
+			      				<!-- paciente -->
 			      				<div class="row">
-			      					<div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
+				                    <div class="col-md-10 offset-md-1 mb-1 input-group input-group-sm">
+			                            <div class="input-group-prepend">
+			                                <label class="input-group-text" for="paciente_id">Paciente</label>
+			                            </div>
+			                            <select class="custom-select custom-select-sm select2 select2bs4" id="paciente_id" name="paciente_id" onchange="actualiza_nombre_completo();">
+			                                <option value="" selected="selected">Seleccionar.....</option>
+			                                @foreach($pacientes as $p)
+			                                    <option value="{{ $p->id }}"> {{ $p->nombre_completo }}</option>
+			                                @endforeach
+			                            </select>
+				                    </div>
+			                    </div>
+			                    <!-- /paciente -->
+	      						<div class="row">
+			      					<div class="col-md-10 offset-md-1 input-group mb-1 input-group-sm">
 			                            <div class="input-group-prepend">
 			                                <label class="input-group-text">Nombre</label>
 			                            </div>
-			                            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" required value="{{ old('nombre_completo') }}">
+			                            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" value="{{ old('nombre_completo') }}" required>
 			                        </div>
 			      				</div>
 			      				<div class="row">
@@ -230,6 +246,17 @@
 		$(function() {
 	  		$('[data-toggle="tooltip"]').tooltip()
 		});
+
+		function actualiza_nombre_completo(){
+			var paciente = document.getElementById('paciente_id');
+			var paciente_id = paciente.options[paciente.selectedIndex].value;
+            var paciente_nombre = paciente.options[paciente.selectedIndex].text;
+            if (paciente_id == '') {
+            	document.getElementById('nombre_completo').value = '';
+            }else{
+            	document.getElementById('nombre_completo').value = paciente_nombre;
+            }
+		}
 
 		$(function () {
             //Initialize Select2 Elements
