@@ -921,7 +921,14 @@
                     document.getElementById("ccopago").value = info.copago;
                     document.getElementById("peso").value = info.peso;
                     document.getElementById("talla").value = info.talla;
-                    document.getElementById("bmi").value = parseFloat(info.bmi);
+                    //document.getElementById("bmi").value = parseFloat(info.bmi);
+                    if (info.bmi == null) {
+                        document.getElementById('bmi').value = 0;
+                        document.getElementById('bmi_show').innerHTML = '<h3>0</h3>';
+                    }else{
+                        document.getElementById('bmi').value = parseFloat(info.bmi);
+                        document.getElementById('bmi_show').innerHTML = '<h3>'+parseFloat(info.bmi)+'</h3>';
+                    }
                     document.getElementById("pulso").value = info.pulso;
                     document.getElementById("temperatura").value = info.temperatura;
                     document.getElementById("respiracion").value = info.respiracion;
@@ -946,7 +953,7 @@
                     document.createElement("buttom").append();
 
                     document.getElementById("impresion_receta").setAttribute('href', asset+'admisiones/generar_receta/'+info.id );
-                    document.getElementById('bmi_show').innerHTML = '<h3>'+parseFloat(info.bmi).toFixed(2)+'</h3>';
+                    //document.getElementById('bmi_show').innerHTML = '<h3>'+parseFloat(info.bmi).toFixed(2)+'</h3>';
                 },
                 error: function(error){
                     console.log(error);
@@ -1439,11 +1446,19 @@
         function fn_calcula_bmi(){
             var peso  = document.getElementById('peso').value;
             var talla = document.getElementById('talla').value;
-            if (peso > 0 && talla > 0) {
-                peso = peso / 2.2;
-                talla *= talla
-                document.getElementById('bmi').value = peso / talla;
-                document.getElementById('bmi_show').innerHTML = '<h3>'+(peso / talla).toFixed(2)+'</h3>';
+            if (peso != '' ||talla != '') {
+                if (peso > 0 && talla > 0) {
+                    peso = peso / 2.2;
+                    talla *= talla
+                    document.getElementById('bmi').value = peso / talla;
+                    document.getElementById('bmi_show').innerHTML = '<h3>'+(peso / talla).toFixed(2)+'</h3>';
+                }else{
+                    document.getElementById('bmi').value = 0;
+                    document.getElementById('bmi_show').innerHTML = '<h3>'+0+'</h3>';    
+                }
+            }else{
+                document.getElementById('bmi').value = 0;
+                document.getElementById('bmi_show').innerHTML = '<h3>'+0+'</h3>';
             }
         }
     </script>

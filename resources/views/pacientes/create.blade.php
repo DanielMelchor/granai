@@ -550,6 +550,8 @@
                               title: "Precaución",   
                               text: "Numero de Expediente ya existe, Favor verifique",   
                               type: "warning" 
+                        }, function(){
+                            document.getElementById('expediente_no').value = '';
                         });
                     }
                 },

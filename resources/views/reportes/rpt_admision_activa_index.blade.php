@@ -14,8 +14,6 @@
 			<div class="row">
 				<div class="col-md-9 offset-md-1">
 					<h5>Admisiones Activas</h5>
-					{{route('inicio')}}
-					{{ path('public') }}
 				</div>
 				<div class="col-md-2" style="text-align: right;">
 					<button type="button" class="btn btn-sm btn-config" title="Parámetros" data-toggle="modal" data-target="#parametrosModal"><i class="fas fa-cog"></i></button>
@@ -146,8 +144,10 @@
     	var fecha_inicial = document.getElementById('fecha_inicio').value;
     	var fecha_final   = document.getElementById('fecha_final').value;
     	var tipo_admision = document.getElementById('tipo_admision').value;
+
     	if(fecha_inicial == '' || fecha_final == '') return false;
-		return window.location.href = "{{route('inicio')}}/reportes/admisiones_activas/"+fecha_inicial+"/"+fecha_final+"/"+tipo_admision;
+		/*return window.location.href = "{{route('inicio')}}/reportes/admisiones_activas/"+fecha_inicial+"/"+fecha_final+"/"+tipo_admision;*/
+		window.location.href = "{{ route('rpt_admisiones_activas',["+fecha_inicial+","+fecha_final+", 'T']) }}";
     }
 	</script>
 @endsection

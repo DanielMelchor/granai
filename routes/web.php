@@ -15,15 +15,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('lang/{lang}', 'LanguageController@swap')->name('lang.swap');
 
+Route::get('/welcome','HomeController@welcome')->name('welcome');
+
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+
 Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/a', 'HomeController@inicio')->name('inicio');
-Route::get('/','AgendaController@nuevo_index')->name('nueva_agenda');
-Route::get('/welcome', 'HomeController@welcome')->name('welcome');
-Route::get('calendario', 'HomeController@calendario')->name('calendario');
+//Route::get('/', 'HomeController@inicio')->name('inicio');
+//Route::get('/','AgendaController@nuevo_index')->name('nueva_agenda');
+//Route::get('/welcome', 'HomeController@welcome')->name('welcome');
+//Route::get('calendario', 'HomeController@calendario')->name('calendario');
 
 Auth::routes();
 
@@ -179,6 +184,10 @@ Route::group(['prefix' => 'especialidades'], function () {
 	Route::post('grabar','especialidadController@store')->name('grabar_especialidad');
 	Route::get('editar/{especialidad_id}','especialidadController@edit')->name('editar_especialidad');
 	Route::post('actualizar/{especialidad_id}','especialidadController@update')->name('actualizar_especialidad');
+});
+
+Route::group(['prefix' => 'formas_pago'], function () {
+	Route::post('campos_requeridos','FormaPagoController@campos_requeridos')->name('campos_requeridos');
 });
 
 Route::group(['prefix' => 'hospitales'], function () {
@@ -372,6 +381,9 @@ Route::group(['prefix' => 'pagos'], function () {
 	Route::post('trae_detalle_recibo', 'pagoController@trae_detalle_recibo')->name('trae_detalle_recibo');
 	Route::post('trae_pago_recibo', 'pagoController@trae_pago_recibo')->name('trae_pago_recibo');
 	Route::post('recibo_anulacion/{recibo_id}','pagoController@recibo_anular')->name('recibo_anular');
+	Route::post('saldo_x_recibo', 'pagoController@trae_saldo_x_recibo')->name('trae_saldo_x_recibo');
+	Route::post('recibos_con_saldo', 'pagoController@trae_recibos_con_saldo')->name('recibos_con_saldo');
+	Route::post('forma_pago_recibo', 'pagoController@trae_detalle_pago_x_recibo')->name('forma_pago_recibo');
 });
 
 Route::group(['prefix' => 'usuarios'], function(){

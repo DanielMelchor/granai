@@ -374,11 +374,11 @@
     <!-- /re apertura-->
     <!-- add cargo -->
     <div class="modal fade" id="addCargo" role="dialog" aria-labelledby="addCargoLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form class="form-horizontal" id="addCargoForm" name="cargos" action="#">
                     <div class="card-navy">
-                        <div class="card-header text-center">
+                        <div class="card-header">
                             <div class="row">
                                 <div class="col-md-8 offset-md-1">
                                     Nuevo Cargo
@@ -407,6 +407,14 @@
                                                 @endforeach
                                         </select>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group mb-1 col-md-10 offset-md-1">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Descripción</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="cargo_descripcion" name="cargo_descripcion" required>
                                 </div>
                             </div>
                             <div class="row">
@@ -530,6 +538,22 @@
                 grabar_local();
                 return false;
             })
+        });
+
+        $("#producto_id").change(function(){
+            var producto_id = document.getElementById('producto_id').value;
+            $.ajax({
+                url: "{{ route('descripcion') }}",
+                type: "POST",
+                async: true,
+                data: {"_token": "{{ csrf_token() }}", cod: producto_id},
+                success: function(response){
+                    document.getElementById('cargo_descripcion').value = response;
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
         });
 
         function mensaje(){
@@ -671,6 +695,7 @@
             var producto = document.getElementById('producto_id');
             var producto_id = producto.options[producto.selectedIndex].value;
             var producto_descripcion = producto.options[producto.selectedIndex].text;
+            var cargo_descripcion = document.getElementById('cargo_descripcion').value;
             var cantidad = document.getElementById('cantidad').value;
             var precio_unitario = document.getElementById('precio_unitario').value;
             var precio_total = cantidad * precio_unitario;
@@ -678,16 +703,17 @@
             var total_aseguradora = document.getElementById('total_aseguradora').value;
             var admision_id = document.getElementById('admision_id').value;
             var linea = {
-                admision_id : admision_id,
-                linea       : nLinea,
-                producto_id : producto_id,
-                producto_descripcion : producto_descripcion,
-                cantidad : cantidad,
-                precio_unitario : precio_unitario,
-                precio_total    : precio_total,
-                total_cliente   : total_cliente,
-                total_aseguradora : total_aseguradora,
-                facturado : 'N'
+                admision_id          : admision_id,
+                linea                : nLinea,
+                producto_id          : producto_id,
+                producto_descripcion : cargo_descripcion,
+                cargo_descripcion    : cargo_descripcion,
+                cantidad             : cantidad,
+                precio_unitario      : precio_unitario,
+                precio_total         : precio_total,
+                total_cliente        : total_cliente,
+                total_aseguradora    : total_aseguradora,
+                facturado            : 'N'
             }
 
             if(!localStorage.local_db){

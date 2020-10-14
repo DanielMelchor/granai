@@ -82,6 +82,15 @@ class ventaController extends Controller
         $formas_pago = forma_pago::where('estado', 'A')->get();
         $bancos      = Banco::where('tipo_referencia', 'B')->where('estado', 'A')->get();
         $tarjetas    = Banco::where('tipo_referencia', 'T')->where('estado', 'A')->get();
+        /*$recibos     = DB::table('maestro_pagos as mp')
+                       ->join('detalle_pagos as dp', 'mp.id', 'dp.maestro_pago_id')
+                       ->leftjoin('pago_documentos as pd', 'mp.id', 'pd.maestro_pago_id')
+                       ->where('mp.empresa_id', Auth::user()->empresa_id)
+                       ->where('mp.estado', 'A')
+                       ->where('mp.paciente_id', $paciente_id)
+                       ->groupBy('mp.id', 'mp.serie', 'mp.correlativo')
+                       ->select('mp.id', 'mp.serie', 'mp.correlativo', DB::raw('SUM(IFNULL(dp.monto,0) - IF(pd.estado = "A", IFNULL(pd.total_aplicado,0), 0)) as total_recibo'))
+                       ->get();*/
     	if (empty($caja)) {
     		return Redirect::back()->withErrors('Usuario no permitido para emitir Facturas');
     	} else{
@@ -163,81 +172,121 @@ class ventaController extends Controller
     }
 
     public function factura_store(){
-        $resolucion_id    = $_POST['resolucion_id'];
-        $admision_id    = $_POST['admision_id'];
-        $paciente_id    = $_POST['paciente_id'];
-        $tipodocumento_id = $_POST['tipo_documento_id'];
-        $fecha = $_POST['fecha_emision'];
-        $serie = strtoupper($_POST['serie']);
-        $correlativo = $_POST['correlativo'];
-        $condicion   = $_POST['condicion'];
-        $nit = $_POST['nit'];
-        $nombre = $_POST['nombre'];
-        $direccion = $_POST['direccion'];
-        $data = (array) json_decode($_POST['arreglo'], true);
-        $dataPago = (array) json_decode($_POST['pagos'], true);
-        $totalRegistros = count($data);
+        /*==============================================================================
+        Variables recibidas
+        ==============================================================================*/
+        $resolucion_id      = $_POST['resolucion_id'];
+        $admision_id        = $_POST['admision_id'];
+        $paciente_id        = $_POST['paciente_id'];
+        $tipodocumento_id   = $_POST['tipo_documento_id'];
+        $fecha              = $_POST['fecha_emision'];
+        $serie              = strtoupper($_POST['serie']);
+        $correlativo        = $_POST['correlativo'];
+        $condicion          = $_POST['condicion'];
+        $nit                = $_POST['nit'];
+        $nombre             = $_POST['nombre'];
+        $direccion          = $_POST['direccion'];
+        $data               = (array) json_decode($_POST['arreglo'], true);
+        $dataPago           = (array) json_decode($_POST['pagos'], true);
+        $totalRegistros     = count($data);
         $totalRegistrosPago = count($dataPago);
-        $cadena_error = '';
+        $cadena_error       = '';
         $hoy = Carbon::now()->format('Y-m-d');
 
+        /*==============================================================================
+        verifica que exista el tipo de documento
+        ==============================================================================*/
         $tipo_documento = Tipo_documento::findOrFail($tipodocumento_id)->first();
-        
-        $existe = maestro_documento::where('empresa_id', Auth::user()->empresa_id)->where('tipodocumento_id', 1)->where('serie', $serie)->where('correlativo', $correlativo)->count();
 
-        if ($totalRegistros == 0) {
-            $cadena_error = $cadena_error.', No existe detalle de factura ';
-        }
+        /*==============================================================================
+        verifica si la factura ya existe grabada
+        ==============================================================================*/
+        $existe = maestro_documento::where('empresa_id', Auth::user()->empresa_id)->where('tipodocumento_id', $tipodocumento_id)->where('serie', $serie)->where('correlativo', $correlativo)->count();
+
         if ($existe > 0) {
             $cadena_error = $cadena_error.', Factura '.$serie.' - '.$correlativo.' Ya existe';
         }
+        /*==============================================================================
+        verifica que se haya recibido detalle para factura
+        ==============================================================================*/
+        if ($totalRegistros == 0) {
+            $cadena_error = $cadena_error.', No existe detalle de factura ';
+        }
+
+        /*==============================================================================
+        Si la factura es de contado verifica que se haya recibido registros de pago
+        ==============================================================================*/
         if ($condicion == 0 && $totalRegistrosPago == 0) {
             $cadena_error = $cadena_error.', No existe forma de pago de documento ';
         }
 
-        $recibo_resolucion = Resolucion::where('caja_id', Auth::user()->caja_id)->where('tipo_documento',4)->where('estado', 'A')->first();
-
-        if (!isset($recibo_resolucion)) {
-            $recibo_resolucion_id = 0;
-            $recibo_resolucion_serie = '0';
-            $recibo_resolucion_correlativo = 0;
-            $cadena_error = $cadena_error. ', Caja no cuenta con una resolucion que permita generar recibos de pago';
-        }else {
-            $recibo_resolucion_id          = $recibo_resolucion->id;
-            $recibo_resolucion_serie       = $recibo_resolucion->serie;
-            $recibo_resolucion_correlativo = $recibo_resolucion->ultimo_correlativo + 1;
+        /*==============================================================================
+        Revisa si se debe de crear un nuevo recibo
+        ==============================================================================*/
+        $total_pago_sin_recibo = 0;
+        $total_pago_con_recibo = 0;
+        $recibo_existente_id   = 0;
+        for ($i=0; $i < $totalRegistrosPago; $i++) {
+            if ($dataPago[$i]['recibo_id'] == 0) {
+                $total_pago_sin_recibo += 1;
+            }else{
+                $total_pago_con_recibo += 1;
+                $recibo_existente_id   = $dataPago[$i]['recibo_id'];
+            }
         }
 
-        if ($cadena_error != '') {
+        if ($total_pago_sin_recibo != 0) {
+            /*==============================================================================
+            Verifica que la caja tenga resolucion activa para emitir recibos de pago
+            ==============================================================================*/
+            $recibo_resolucion = Resolucion::where('caja_id', Auth::user()
+                                 ->caja_id)->where('tipo_documento', 4)
+                                 ->where('estado', 'A')->first();
+
+            if (!isset($recibo_resolucion)) {
+                $cadena_error = $cadena_error. ', Caja no cuenta con una resolucion que permita generar recibos de pago';
+            }
+        }
+
+        if (!isset($cadena_error)) {
             $respuesta1 = array('estado' => '0','respuesta' => $cadena_error);
-        }
-        else{
+        }else{
             $detalle_total = 0;
-            $pago_total    = 0;
+            $pago_total_sin_recibo = 0;
+            $pago_total_con_recibo = 0;
 
-            /*Encabezado de Factura*/
-            $maestro = new maestro_documento();
-            $maestro->empresa_id = Auth::user()->empresa_id;
-            $maestro->caja_id    = Auth::user()->caja_id;
+            /*==============================================================================
+            Graba encabezado de factura
+            ==============================================================================*/
+            $maestro                   = new maestro_documento();
+            $maestro->empresa_id       = Auth::user()->empresa_id;
+            $maestro->caja_id          = Auth::user()->caja_id;
             $maestro->tipodocumento_id = $tipodocumento_id;
             $maestro->resolucion_id    = $resolucion_id;
             $maestro->fecha_emision    = $fecha;
-            $maestro->serie       = $serie;
-            $maestro->correlativo = $correlativo;
-            $maestro->paciente_id = $paciente_id;
-            $maestro->condicion   = $condicion;
-            $maestro->nit         = $nit;
-            $maestro->nombre      = $nombre;
-            $maestro->direccion   = $direccion;
-            $maestro->estado      = 'A';
+            $maestro->serie            = $serie;
+            $maestro->correlativo      = $correlativo;
+            $maestro->paciente_id      = $paciente_id;
+            $maestro->condicion        = $condicion;
+            $maestro->nit              = $nit;
+            $maestro->nombre           = $nombre;
+            $maestro->direccion        = $direccion;
+            $maestro->estado           = 'A';
             $maestro->save();
 
-            /*Actualiza la resolucion*/
-            $factura_resolucion = Resolucion::findOrFail($resolucion_id);
-            $factura_resolucion->ultimo_correlativo = $correlativo;
-            $factura_resolucion->save();
+            /*==============================================================================
+            Graba registro en bitacora de nueva factura
+            ==============================================================================*/
 
-            /*Detalle de factura*/
+            $bitacora = new bitacora_admision();
+            $bitacora->admision_id   = $admision_id;
+            $bitacora->proceso       = 'FACTURA';
+            $bitacora->observaciones = 'Factura '.$maestro->serie.' - '.$maestro->correlativo;
+            $bitacora->save();
+
+            /*==============================================================================
+            Graba detalle de factura
+            ==============================================================================*/
             for ($i=0; $i < $totalRegistros ; $i++) {
                 $detalle = new detalle_documento();
                 $detalle->maestro_documento_id      = $maestro->id;
@@ -257,66 +306,111 @@ class ventaController extends Controller
                 $detalle->save();
 
                 $detalle_total += $detalle->precio_neto;
-
-                /*Bitacora de admision*/
-                $bitacora = new bitacora_admision();
-                $bitacora->admision_id   = $admision_id;
-                $bitacora->proceso       = 'FACTURA';
-                $bitacora->observaciones = 'Factura '.$maestro->serie.' - '.$maestro->correlativo.' cargo '.$detalle->descripcion;
-                $bitacora->save();
             }
 
-            /*Pago de documento*/
-            if ($condicion == 0) {
-                /*Encabezado de Recibo*/
+            /*==============================================================================
+            Crea un nuevo recibo si se recibio un pago sin recibo
+            ==============================================================================*/
+            if ($total_pago_sin_recibo > 0) {
                 $recibo = new maestro_pago();
                 $recibo->empresa_id       = Auth::user()->empresa_id;
                 $recibo->caja_id          = Auth::user()->caja_id;
                 $recibo->paciente_id      = $paciente_id;
                 $recibo->tipodocumento_id = 4;
-                $recibo->resolucion_id    = $recibo_resolucion_id;
+                $recibo->resolucion_id    = $recibo_resolucion->id;
                 $recibo->fecha_emision    = $hoy;
-                $recibo->serie            = $recibo_resolucion_serie;
-                $recibo->correlativo      = $recibo_resolucion_correlativo;
+                $recibo->serie            = $recibo_resolucion->serie;
+                $recibo->correlativo      = $recibo_resolucion->ultimo_correlativo + 1;
                 $recibo->estado           = 'A';
                 $recibo->save();
 
-                /*Actualiza resolucion de recibo*/
-                $resolucion_recibo = Resolucion::findOrFail($recibo->resolucion_id);
-                $resolucion_recibo->ultimo_correlativo = $recibo_resolucion_correlativo;
-                $resolucion_recibo->save();
-
-                for ($i=0; $i < $totalRegistrosPago; $i++) { 
-                    /*Detalle de recibo*/
-                    $recibo_detalle = new detalle_pago();
-                    $recibo_detalle->maestro_pago_id = $recibo->id;
-                    $recibo_detalle->forma_pago   = $dataPago[$i]['forma_pago'];
-                    $recibo_detalle->banco_id     = $dataPago[$i]['entidad_id'];
-                    $recibo_detalle->cuenta_no    = $dataPago[$i]['cuenta_no'];
-                    $recibo_detalle->documento_no = $dataPago[$i]['documento_no'];
-                    $recibo_detalle->autoriza_no  = $dataPago[$i]['autoriza_no'];
-                    $recibo_detalle->monto        = $dataPago[$i]['monto'];
-                    $recibo_detalle->estado       = 'A';
-                    $recibo_detalle->save();
-
-                    $pago_total += $recibo_detalle->monto;
-
-                    /*Pago de documento*/
-                    $pago_documento = new pago_documento();
-                    $pago_documento->maestro_documento_id = $maestro->id;
-                    $pago_documento->maestro_pago_id      = $recibo->id;
-                    if ($admision_id != 0) {
-                        $pago_documento->admision_id      = $admision_id;
-                    }else{
-                        $pago_documento->admision_id      = null;
-                    }
-                    $pago_documento->saldo_documento      = $detalle_total;
-                    $pago_documento->total_aplicado       = $recibo_detalle->monto;
-                    $pago_documento->estado               = 'A';
-                    $pago_documento->save();
+                //==============================================================================
+                //Actualiza correlativo de Recibos en resolucion
+                //==============================================================================
+                if ($recibo_resolucion->ultimo_correlativo == $recibo->correlativo) {
+                    $recibo_resolucion->estado = 'I';
                 }
+                $recibo_resolucion->ultimo_correlativo = $recibo->correlativo;
+                $recibo_resolucion->save();
             }
 
+            /*==============================================================================
+            Graba detalle de recibos
+            ==============================================================================*/
+            for ($i=0; $i < $totalRegistrosPago; $i++) {
+                if ($dataPago[$i]['recibo_id'] == 0) {
+                    $recibo_detalle = new detalle_pago();
+                    $recibo_detalle->maestro_pago_id = $recibo->id;
+                    $recibo_detalle->forma_pago      = $dataPago[$i]['forma_pago'];
+                    $recibo_detalle->banco_id        = $dataPago[$i]['entidad_id'];
+                    $recibo_detalle->cuenta_no       = $dataPago[$i]['cuenta_no'];
+                    $recibo_detalle->documento_no    = $dataPago[$i]['documento_no'];
+                    $recibo_detalle->autoriza_no     = $dataPago[$i]['recibo_id'];//$dataPago[$i]['autoriza_no'];
+                    $recibo_detalle->monto           = $dataPago[$i]['monto'];
+                    $recibo_detalle->estado          = 'A';
+                    $recibo_detalle->save();
+                    $pago_total_sin_recibo += $recibo_detalle->monto;
+                }/*else{
+                    $recibo_detalle = new detalle_pago();
+                    $recibo_detalle->maestro_pago_id = $dataPago[$i]['recibo_id'];
+                    $recibo_detalle->forma_pago      = $dataPago[$i]['forma_pago'];
+                    $recibo_detalle->banco_id        = $dataPago[$i]['entidad_id'];
+                    $recibo_detalle->cuenta_no       = $dataPago[$i]['cuenta_no'];
+                    $recibo_detalle->documento_no    = $dataPago[$i]['documento_no'];
+                    $recibo_detalle->autoriza_no     = $dataPago[$i]['autoriza_no'];
+                    $recibo_detalle->monto           = $dataPago[$i]['monto'];
+                    $recibo_detalle->estado          = 'A';
+                    $recibo_detalle->save();
+                    $pago_total_con_recibo += $recibo_detalle->monto;
+                }*/
+            }
+
+            /*==============================================================================
+            Graba pago de documento
+            ==============================================================================*/
+            if ($total_pago_sin_recibo > 0) {
+                $pago_documento = new pago_documento();
+                $pago_documento->maestro_documento_id = $maestro->id;
+                $pago_documento->maestro_pago_id      = $recibo->id;
+                $pago_documento->saldo_documento      = $detalle_total;
+                $pago_documento->total_aplicado       = $pago_total_sin_recibo;
+                $pago_documento->estado               = 'A';
+                if ($admision_id != 0) {
+                    $pago_documento->admision_id      = $admision_id;
+                }else{
+                    $pago_documento->admision_id      = null;
+                }
+                $pago_documento->save();
+            }
+
+            if ($total_pago_con_recibo > 0) {
+                $pago_documento = new pago_documento();
+                $pago_documento->maestro_documento_id = $maestro->id;
+                $pago_documento->maestro_pago_id      = $recibo_existente_id;
+                $pago_documento->saldo_documento      = $detalle_total;
+                $pago_documento->total_aplicado       = $pago_total_con_recibo;
+                $pago_documento->estado               = 'A';
+                if ($admision_id != 0) {
+                    $pago_documento->admision_id      = $admision_id;
+                }else{
+                    $pago_documento->admision_id      = null;
+                }
+                $pago_documento->save();
+            }
+
+            /*==============================================================================
+            Actualiza correlativo en resolucion de facturas
+            ==============================================================================*/
+            $factura_resolucion = Resolucion::findOrFail($resolucion_id);
+            $factura_resolucion->ultimo_correlativo = $correlativo;
+            if ($correlativo == $factura_resolucion->correlativo_final ) {
+                $factura_resolucion->estado = 'I';
+            }
+            $factura_resolucion->save();
+
+            /*==============================================================================
+            Devuelve mensaje de factura grabada con exito
+            ==============================================================================*/
             $respuesta1 = array('estado' => 'A','respuesta' => 'Factura '.$serie.'-'.$correlativo.' Grabada con exito !!!', 'factura_id' => $maestro->id);
             return Response::json($respuesta1);
         }
@@ -897,7 +991,8 @@ class ventaController extends Controller
                         $join->on('td.id', 'vvd.tipodocumento_id')
                         ->where('vvd.empresa_id', Auth::user()->empresa_id)
                         ->where('vvd.caja_id', '=', $caja_id)
-                        ->where('vvd.fecha_emision', '=', $fecha);
+                        ->where('vvd.fecha_emision', '=', $fecha)
+                        ->where('vvd.corte_id',null);
                    })
                    ->where('td.id', '!=', 4)
                    ->groupBy('td.id', 'td.descripcion', 'td.signo')
@@ -915,6 +1010,7 @@ class ventaController extends Controller
                    ->where('vvd.empresa_id', Auth::user()->empresa_id)
                    ->where('vvd.caja_id', $caja_id)
                    ->whereDate('vvd.fecha_emision', $fecha)
+                   ->where('vvd.corte_id',null)
                    ->select('tipodocumento_descripcion','serie', 'correlativo', 'fecha_emision', 'nit', 'nombre', 'total_documento')
                    ->get();
         return Response::json($detalle);
@@ -930,7 +1026,8 @@ class ventaController extends Controller
                         $join->on('fp.id', 'vfpd.forma_pago')
                         ->where('vfpd.empresa_id', Auth::user()->empresa_id)
                         ->where('vfpd.caja_id', '=', $caja_id)
-                        ->where('vfpd.fecha_emision', '=', $fecha);
+                        ->where('vfpd.fecha_emision', '=', $fecha)
+                        ->where('vfpd.corte_id',null);
                    })
                     ->groupBy('fp.id', 'fp.descripcion')
                     ->select('fp.id', 'fp.descripcion', DB::raw('SUM(IFNULL(vfpd.total_forma_pago,0)) as total'))
@@ -946,6 +1043,7 @@ class ventaController extends Controller
                    ->where('vccr.empresa_id', Auth::user()->empresa_id)
                    ->where('vccr.caja_id', $caja_id)
                    ->whereDate('vccr.fecha_emision', $fecha)
+                   ->where('vccr.corte_id',null)
                    ->select('serie', 'correlativo', 'tipo_admision', 'admision', 'nombre_completo', 'total_recibo', 'efectivo', 'cheque', 'tarjeta')
                    ->get();
         return Response::json($detalle);
@@ -978,6 +1076,7 @@ class ventaController extends Controller
                       ->whereDate('fecha_emision', $validData['fecha'])
                       ->update(['corte_id' => $corte->id]);
 
+        return Redirect::route('editar_corte', [$corte->id])->with('message','Corte de caja Guardado con exito');
     }
 
     public function corte_edit($id){

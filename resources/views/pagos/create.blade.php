@@ -288,38 +288,10 @@
                                         </div>
                                         <select class="custom-select custom-select-sm select2 select2bs4" id="fpago_id"  name="fpago_id" onchange="verifica_campos(); return false;">
                                             <option value="">Seleccionar...</option>
-                                            <option value="E">Efectivo</option>
-                                            <option value="B">Cheque</option>
-                                            <option value="T">Tarjeta</option>
-                                            <option value="X">Transferencia Bancaria</option>
-                                            <option value="R">Recibo de pago</option>
+                                            @foreach($formas_pago as $fp)
+                                                <option value="{{ $fp->id }}">{{ $fp->descripcion }}</option>
+                                            @endforeach
                                         </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-10 offset-md-1 text-center">
-                                    <div class="form-group form-control-sm clearfix">
-                                        <div class="icheck-primary d-inline">
-                                            <input type="radio" id="efectivo" name="fpago" value="E" checked>
-                                            <label for="efectivo">Efectivo</label>
-                                        </div>
-                                        <div class="icheck-primary d-inline">
-                                            <input type="radio" id="cheque" name="fpago" value="B">
-                                            <label for="cheque">Cheque</label>
-                                        </div>
-                                        <div class="icheck-primary d-inline">
-                                            <input type="radio" id="tarjeta" name="fpago" value="T">
-                                            <label for="tarjeta">Tarjeta</label>
-                                        </div>
-                                        <div class="icheck-primary d-inline">
-                                            <input type="radio" id="transferencia" name="fpago" value="X">
-                                            <label for="transferencia">Transferencia Bancaria</label>
-                                        </div>
-                                        <div class="icheck-primary d-inline">
-                                            <input type="radio" id="recibo" name="fpago" value="R">
-                                            <label for="recibo">Recibo de pago</label>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -392,20 +364,6 @@
         </div>
     </div>
     <!-- /forma de pago -->
-    <!-- mensaje modal -->
-    <div class="modal fade" id="mensajeModal" tabindex="-1" role="dialog" aria-labelledby="mensajeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <h3 id="texto_mensaje" class="modal_texto text-center" style="color: green;"></h3>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- /mensaje modal -->
 @endsection
 @section('js')
     <link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -440,46 +398,65 @@
 
         function verifica_campos(){
             var fpago_id = document.getElementById('fpago_id').value;
-            alert(fpago_id);
-        }
+            if (fpago_id == '1') {
+                $("#banco").hide();
+                $("#cuenta").hide();
+                $("#tarjeta1").hide();
+                $("#documento").hide();
+                $("#autorizacion").hide();
+                $('#banco_id').prop("required", false);
+                $("#cuenta_no").prop('required', false);
+                $("#documento_no").prop('required', false);
+                $("#autoriza_no").prop('required', false);
+            }
+            if (fpago_id == '2') {
+                $("#banco").show();
+                $('#banco_id').prop("required", true);
+                $("#cuenta").show();
+                $("#cuenta_no").prop('required', true);
+                $("#tarjeta1").hide();
+                $("#documento").show();
+                $("#documento_no").prop('required', true);
+                $("#autorizacion").show();
+                $("#autoriza_no").prop('required', true);
+            }
+            if (fpago_id == '3') {
+                $('#banco_id').prop("required", false);
+                $('#cuenta_no').prop("required", false);
+                $("#banco").hide();
+                $("#cuenta").hide();
+                $("#tarjeta1").show();
+                $("#tarjeta_id").prop('required', true);
+                $("#documento").show();
+                $("#documento_no").prop('required', true);
+                $("#autorizacion").show();
+                $("#autoriza_no").prop('required', true);
+            }
 
-        $("input[name=fpago]").click(function () {    
-            forma_pago = $(this).val();
-            if (forma_pago == 'E') {
-                 $("#banco").hide();
-                 $("#cuenta").hide();
-                 $("#tarjeta1").hide();
-                 $("#documento").hide();
-                 $("#autorizacion").hide();
-                 $('#banco_id').prop("required", false);
-                 $("#cuenta_no").prop('required', false);
-                 $("#documento_no").prop('required', false);
-                 $("#autoriza_no").prop('required', false);
+            if (fpago_id == '4') {
+                $("#banco").hide();
+                $("#cuenta").hide();
+                $("#tarjeta1").hide();
+                $("#autorizacion").hide();
+                $('#banco_id').prop("required", false);
+                $("#cuenta_no").prop('required', false);
+                $("#autoriza_no").prop('required', false);
+                $("#documento").show();
+                $("#documento_no").prop('required', true);
             }
-            if (forma_pago == 'B') {
-                 $("#banco").show();
-                 $('#banco_id').prop("required", true);
-                 $("#cuenta").show();
-                 $("#cuenta_no").prop('required', true);
-                 $("#tarjeta1").hide();
-                 $("#documento").show();
-                 $("#documento_no").prop('required', true);
-                 $("#autorizacion").show();
-                 $("#autoriza_no").prop('required', true);
+
+            if (fpago_id == '5') {
+                $("#banco").hide();
+                $("#cuenta").hide();
+                $("#tarjeta1").hide();
+                $("#autorizacion").hide();
+                $('#banco_id').prop("required", false);
+                $("#cuenta_no").prop('required', false);
+                $("#autoriza_no").prop('required', false);
+                $("#documento").show();
+                $("#documento_no").prop('required', true);
             }
-            if (forma_pago == 'T') {
-                 $('#banco_id').prop("required", false);
-                 $('#cuenta_no').prop("required", false);
-                 $("#banco").hide();
-                 $("#cuenta").hide();
-                 $("#tarjeta1").show();
-                 $("#tarjeta_id").prop('required', true);
-                 $("#documento").show();
-                 $("#documento_no").prop('required', true);
-                 $("#autorizacion").show();
-                 $("#autoriza_no").prop('required', true);
-            }
-        });
+        }
 
         window.addEventListener('load', function(){
             var local_db = [];
@@ -590,8 +567,11 @@
                         document.getElementById('resolucion_id').value = 0;
                         document.getElementById('serie').value = '';
                         document.getElementById('correlativo').value = '';
-                        $('.modal_texto').html('No existe resolucion en la caja que permita emitir documentos con la serie '+serie);
-                        $("#mensajeModal").modal('show');
+                        swal({
+                            title: 'Error !!!',
+                            text: 'No existe resolucion en la caja que permita emitir documentos con la serie '+serie,
+                            type: 'error',
+                        });
                     } else {
                         document.getElementById('resolucion_id').value = info.resolucion_id;
                         document.getElementById('correlativo').value = info.correlativo;
@@ -609,7 +589,8 @@
 
             if(localStorage.local_db){
                 var local_db = JSON.parse(localStorage.local_db);
-                local_db.sort();
+                local_db.sort(compare);
+                //local_db.sort();
 
                 var html = '';
                 var htmlf = '';
@@ -708,14 +689,15 @@
             id   = document.getElementById('documento_id').value;            
             pago = document.getElementById('pago_pagar').value;
             var local_db = JSON.parse(localStorage.local_db);
-            local_db.sort();
+            local_db.sort(compare);
             for (var i = 0; i < local_db.length; i++) {
                 if (local_db[i]['id'] == id) {
                     if (local_db[i]['saldo'] < pago) {
-                        //alert('valor no puede ser mayor')
-                        $('.modal_texto').html('valor no puede ser mayor a saldo');
-                        document.getElementById("texto_mensaje").style.color = "red";
-                        $("#mensajeModal").modal('show');
+                        swal({
+                            title: 'Error !!!',
+                            text: 'Valor a pagar no puede ser mayor a saldo de documento ',
+                            type: 'error',
+                        });
                     }else{
                         var linea = {
                             id                        : id,
@@ -752,6 +734,8 @@
         }
 
         function fn_forma_pago(){
+            document.getElementById('fpago_id').value     = '';
+            $('#fpago_id').change();
             document.getElementById('banco_id').value     = '';
             document.getElementById('cuenta_no').value    = '';
             document.getElementById('documento_no').value = '';
@@ -766,7 +750,8 @@
         }
 
         function fn_fpago_local(){
-            if (forma_pago == 'E') {
+            var forma_pago = document.getElementById('fpago_id').value;
+            if (forma_pago == '1') {
                 var entidad_id            = null;
                 var entidad_descripcion   = '';
                 var cuenta_no             = '';
@@ -775,7 +760,7 @@
                 var monto                 = document.getElementById('monto').value;
                 var formapago_descripcion = 'Efectivo';
             }
-            if (forma_pago == 'B') {
+            if (forma_pago == '2') {
                 var banco        = document.getElementById('banco_id');
                 var entidad_id   = banco.options[banco.selectedIndex].value;
                 var entidad_descripcion = banco.options[banco.selectedIndex].text;
@@ -785,7 +770,7 @@
                 var monto        = document.getElementById('monto').value;
                 var formapago_descripcion = 'Cheque';
             }
-            if (forma_pago == 'T') {
+            if (forma_pago == '3') {
                 var tarjeta = document.getElementById('tarjeta_id');
                 var entidad_id = tarjeta.options[tarjeta.selectedIndex].value;
                 var entidad_descripcion = tarjeta.options[tarjeta.selectedIndex].text;
@@ -794,6 +779,24 @@
                 var autoriza_no   = document.getElementById('autoriza_no').value;
                 var monto         = document.getElementById('monto').value;
                 var formapago_descripcion = 'Tarjeta';
+            }
+            if (forma_pago == '4') {
+                var entidad_id            = null;
+                var entidad_descripcion   = '';
+                var cuenta_no             = '';
+                var documento_no          = document.getElementById('documento_no').value;
+                var autoriza_no           = '';
+                var monto                 = document.getElementById('monto').value;
+                var formapago_descripcion = 'Transferencia Bancaria';
+            }
+            if (forma_pago == '5') {
+                var entidad_id            = null;
+                var entidad_descripcion   = '';
+                var cuenta_no             = '';
+                var documento_no          = document.getElementById('documento_no').value;
+                var autoriza_no           = '';
+                var monto                 = document.getElementById('monto').value;
+                var formapago_descripcion = 'Transferencia Bancaria';
             }
 
             var linea = {
@@ -822,8 +825,26 @@
             nlineaPago += 1;
         }
 
+        //========================================================================
+        // funcion para ordenar detalle
+        //========================================================================
+
+        function compare(a,b){
+            const valorA = a.id;
+            const valorB = b.id;
+            let comparacion = 0;
+
+            if (valorA < valorB) {
+                comparacion = -1;
+            }else{
+                comparacion = 1;
+            }
+            return comparacion;
+        }
+
         function actualizarTablaPago(){
             var pago_db = JSON.parse(localStorage.pago_db);
+            pago_db.sort(compare);
             var html = '';
             var html1 = '';
             var total_pago = 0;
@@ -911,10 +932,11 @@
             }
             
             if (total_facturas == 0 || total_pago == 0) {
-                alert(total_facturas+' '+total_pago)
-                $('.modal_texto').html('Para poder grabar el recibo es necesario que marque documentos a cancelar y la forma de pago del recibo');
-                document.getElementById("texto_mensaje").style.color = "red";
-                $("#mensajeModal").modal('show');
+                swal({
+                    title: 'Error !!!',
+                    text: 'No existen documentos a cancelar, Favor verifique',
+                    type: 'error',
+                });
             }else{
                 fn_grabar_recibo();
             }
@@ -933,14 +955,18 @@
             var total_pago        = parseFloat(document.getElementById('total_pago').value);
             var recibo_total_pago = parseFloat(document.getElementById('recibo_total_pago').value);
             if (total_saldo < total_pago) {
-                $('.modal_texto').html('Total a pagar no puede ser mayor a Saldo Pendiente');
-                document.getElementById("texto_mensaje").style.color = "red";
-                $("#mensajeModal").modal('show');
+                swal({
+                    title: 'Error !!!',
+                    text: 'Total a pagar no puede ser mayor a saldo pendiente',
+                    type: 'error',
+                });
             }else{
                 if (total_pago != recibo_total_pago) {
-                    $('.modal_texto').html('Total formas de pago no puede ser distinto al Total a pagar en documentos');
-                    document.getElementById("texto_mensaje").style.color = "red";
-                    $("#mensajeModal").modal('show');
+                    swal({
+                        title: 'Error !!!',
+                        text: 'Total forma de pago no puede ser distinto al total a pagar en documentos',
+                        type: 'error',
+                    });
                 }else{
                     $.ajax({
                         headers: {
@@ -958,9 +984,13 @@
                                 pagos              : JSON.stringify(pago_db)},
                         success: function(response){
                             var info = response;
-                            $('.modal_texto').html(info.respuesta);
-                            $("#mensajeModal").modal('show');
-                            window.location.href = asset+"pagos/editar_recibo/"+info.recibo_id;
+                            swal({
+                                title: 'Trabajo Finalizado !!!',
+                                text: info.respuesta,
+                                type: 'success',
+                            }, function(){
+                                window.location.href = asset+"pagos/editar_recibo/"+info.recibo_id;
+                            });
                         },
                         error: function(error){
                             console.log(error);
@@ -971,24 +1001,45 @@
         }
 
         function cerrar_modal(modal){
-            alertify.confirm('<i class="fas fa-sign-out-alt"></i> Salir', '<h6>Seguro de salir, si ha realizado cambios estos no seran guardados ? </h6>', function(){ 
-                $('#'+modal).modal('hide');
-                /*if (modal == 'reapertura') {
-                    $('#reapertura').modal('hide');   
-                }else{
-                    $('#addCargo').modal('hide');
-                }*/
-                
+            swal({
+                title: 'Confirmación',
+                text: 'Seguro de Salir, si ha realizado cambios estos no seran guardados  ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonClass: 'btn-success',
+                cancelButtonClass: 'btn-danger',
+                confirmButtonText: 'Si',
+                cancelButtonText: 'No',
+                closeOnConfirm: false,
+                allowEscapeKey: true
+                },
+                function(isConfirm) {
+                    if (isConfirm) { 
+                        $('#'+modal).modal('hide');
+                        swal.close();
+                    }
                 }
-                , function(){ alertify.error('Se deja sin efecto')}
             );
         }
 
         function confirma_salida(){
-            alertify.confirm('<i class="fas fa-sign-out-alt"></i> Salir', '<h6>Seguro de salir, si ha realizado cambios estos no seran guardados ? </h6>', function(){ 
-            history.back();
+            swal({
+                title: 'Confirmación',
+                text: 'Seguro de Salir, si ha realizado cambios estos no seran guardados  ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonClass: 'btn-success',
+                cancelButtonClass: 'btn-danger',
+                confirmButtonText: 'Si',
+                cancelButtonText: 'No',
+                closeOnConfirm: false,
+                allowEscapeKey: true
+                },
+                function(isConfirm) {
+                    if (isConfirm) { 
+                        window.location.href = "{{ route('recibos_listado') }}";
+                    }
                 }
-                , function(){ alertify.error('Se deja sin efecto')}
             );
         }
 

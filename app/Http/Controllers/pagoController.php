@@ -17,6 +17,7 @@ use App\Caja;
 use App\Resolucion;
 use App\Paciente;
 use App\MotivoAnulacion;
+use App\forma_pago;
 
 
 class pagoController extends Controller
@@ -45,6 +46,7 @@ class pagoController extends Controller
         $caja      = Caja::where('id', Auth::user()->caja_id)->first();
         $bancos    = Banco::where('tipo_referencia', 'B')->where('estado', 'A')->get();
         $tarjetas  = Banco::where('tipo_referencia', 'T')->where('estado', 'A')->get();
+        $formas_pago = forma_pago::where('estado', 'A')->get();
 
         if (empty($caja)) {
             return Redirect::back()->withErrors('Usuario no permitido para emitir Recibos');
@@ -53,7 +55,7 @@ class pagoController extends Controller
             if ($resolucion == 0) {
                 return Redirect::back()->withErrors('Caja no cuenta con una resolucion Activa que permita emitir Recibos');
             } else{
-                return view('pagos.create', compact('hoy', 'documento', 'pacientes', 'caja', 'bancos', 'tarjetas'));
+                return view('pagos.create', compact('hoy', 'documento', 'pacientes', 'caja', 'bancos', 'tarjetas', 'formas_pago'));
             }
         }
     }
@@ -239,5 +241,55 @@ class pagoController extends Controller
         }
 
         return Redirect::route('editar_recibo',[$id])->with('message','Recibo anulado con exito !!!');
+    }
+
+    public function trae_saldo_x_recibo(){
+        $recibo_id = $_POST['recibo_id'];
+
+        $saldo = DB::table('maestro_pagos as mp')
+                 ->join('detalle_pagos as dp', 'mp.id', 'dp.maestro_pago_id')
+                 ->leftjoin('pago_documentos as pd', function($join){
+                    $join->on('mp.id', 'pd.maestro_pago_id');
+                    $join->on('pd.estado', DB::raw("'A'"));
+                 })
+                 ->where('empresa_id', Auth::user()->empresa_id)
+                 ->where('mp.id', $recibo_id)
+                 ->where('mp.estado', 'A')
+                 ->groupBy('mp.id')
+                 ->select('mp.id', DB::raw('SUM(IFNULL(dp.monto,0)-IFNULL(pd.total_aplicado,0)) as total'))
+                 ->first();
+
+        return Response::json($saldo);
+    }
+
+    public function trae_detalle_pago_x_recibo(){
+        $recibo_id = $_POST['recibo_id'];
+
+        $detalle = DB::table('detalle_pagos as dp')
+                   ->join('formas_pago as fp', 'dp.forma_pago', 'fp.id')
+                   ->leftjoin('bancos as b', 'dp.banco_id', 'b.id')
+                   ->where('dp.maestro_pago_id', $recibo_id)
+                   ->where('dp.estado', 'A')
+                   ->select('dp.maestro_pago_id','dp.forma_pago', 'fp.descripcion', 'dp.banco_id', 'b.nombre', 'dp.cuenta_no', 'dp.documento_no', 'dp.autoriza_no', 'dp.monto')
+                   ->get();
+
+       return Response::json($detalle);
+    }
+
+    public function trae_recibos_con_saldo(){
+        $paciente_id = $_POST['paciente_id'];
+
+        $recibos     = DB::table('maestro_pagos as mp')
+                       ->join('detalle_pagos as dp', 'mp.id', 'dp.maestro_pago_id')
+                       ->leftjoin('pago_documentos as pd', 'mp.id', 'pd.maestro_pago_id')
+                       ->where('mp.empresa_id', Auth::user()->empresa_id)
+                       ->where('mp.estado', 'A')
+                       ->where('dp.estado', 'A')
+                       ->where('mp.paciente_id', $paciente_id)
+                       ->groupBy('mp.id', 'mp.serie', 'mp.correlativo')
+                       ->select('mp.id', 'mp.serie', 'mp.correlativo')
+                       ->get();
+
+        return Response::json($recibos);
     }
 }

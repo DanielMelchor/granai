@@ -150,15 +150,15 @@
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="{{ route('cambio_clave') }}">Cambio de contraseña</a>
-                <a class="dropdown-item" href="{{ route('logout') }}"
+                <a class="dropdown-item" href="{{ route('logout') }}">Salir</a>
+                <!--<a class="dropdown-item" href="{{ route('logout') }}"
                    onclick="event.preventDefault();
                                  document.getElementById('logout-form').submit();">
                     {{ __('Logout') }}
-                </a>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                </a>-->
+                <!--<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
-                </form>
+                </form> -->
             </div>
           </li>
         </ul>
@@ -188,10 +188,9 @@
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.0.4
+      <b>Version</b> 2.0.1
     </div>
-    <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong> All rights
-    reserved.
+    <strong>Copyright &copy; 2020-2030 <!--<a href="http://adminlte.io">AdminLTE.io</a>. --></strong> Todos los derechos reservados
   </footer>
   <!-- jQuery -->
   <script src="{{ asset('assets/jquery-3.5.1.min.js') }}"></script>

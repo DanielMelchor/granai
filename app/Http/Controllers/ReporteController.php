@@ -1080,12 +1080,34 @@ class ReporteController extends Controller
     }
 
     public function factura_pdf($id){
-      $encabezado = maestro_documento::findOrFail($id);
-      $detalle = detalle_documento::where('maestro_documento_id', $id)
-                 ->select('cantidad', 'precio_bruto', 'descripcion')
+      //$encabezado = maestro_documento::findOrFail($id);
+      $encabezado = DB::table('maestro_documentos as md')
+                    ->join('pacientes as p', 'md.paciente_id', 'p.id')
+                    ->join('detalle_documentos as dd', 'md.id', 'dd.maestro_documento_id')
+                    ->leftjoin('admision_cargo_detalles as acd', 'dd.admision_cargo_detalle_id', 'acd.id')
+                    ->leftjoin('admisiones as a', 'acd.admision_id', 'a.id')
+                    ->select('md.id', 'md.fecha_emision', 'a.admision', 'md.nombre', 'md.direccion', 'md.serie', 'md.correlativo', 'md.nit', 'p.nombre_completo as paciente_nombre')
+                    ->first();
+
+      $detalle = DB::table('detalle_documentos as dd')
+                 ->where('dd.maestro_documento_id', $id)
+                 ->select('dd.cantidad', 'dd.precio_bruto', 'dd.descripcion')
                  ->get();
+      $total_bruto       = detalle_documento::where('maestro_documento_id', $id)
+                         ->select(DB::raw('SUM(IFNULL(precio_bruto,0)) as total_bruto'))
+                         ->first();
+      $total_descuento   = detalle_documento::where('maestro_documento_id', $id)
+                         ->select(DB::raw('SUM(IFNULL(descuento,0)) as total_descuento'))
+                         ->first();
+      $total_recargo     = detalle_documento::where('maestro_documento_id', $id)
+                         ->select(DB::raw('SUM(IFNULL(recargo,0)) as total_recargo'))
+                         ->first();
+      $total_neto        = detalle_documento::where('maestro_documento_id', $id)
+                         ->select(DB::raw('SUM(IFNULL(precio_bruto,0)) as precio_neto'))
+                         ->first();
+      $letras = \NumeroALetras::convertir($total_neto->precio_neto, 'quetzales', 'centavos');
       ini_set('memory_limit', '-1');
-      $pdf = PDF::loadView('reportes.rpt_factura_pdf', compact('encabezado', 'detalle'));
+      $pdf = PDF::loadView('reportes.rpt_factura_pdf', compact('encabezado', 'detalle', 'letras', 'total_bruto', 'total_descuento', 'total_recargo', 'total_neto'));
       $pdf->setPaper('letter','portrait');
       $nombre_informe = 'impresion_factura.pdf';
       return $pdf->stream($nombre_informe);

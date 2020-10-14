@@ -213,7 +213,7 @@
     <div class="modal fade" id="cargoModal" tabindex="-1" role="dialog" aria-labelledby="cargoModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <!--<div class="modal-body"> -->
+                <form class="form-horizontal" id="cargoForm" name="cargoForm" action="#">
                     <div class="card card-navy">
                         <div class="card-header">
                             <div class="row">
@@ -221,7 +221,8 @@
                                     Agregar Producto
                                 </div>
                                 <div class="col-md-3" style="text-align: right;">
-                                    <a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_grabar_local(); return false;"><i class="fas fa-save"></i></a>
+                                    <button type="submit" class="btn btn-sm btn-success" title="Grabar"><i class="fas fa-save"></i></button>
+                                    <!--<a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_grabar_local(); return false;"><i class="fas fa-save"></i></a>-->
                                     <!--<button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" title="Salir"><i class="fas fa-sign-out-alt"></i></button>-->
                                     <button type="button" class="btn btn-sm btn-danger" title="Salir" onclick="cerrar_modal('cargoModal'); return false;"><i class="fas fa-sign-out-alt"></i></button>
                                 </div>
@@ -234,7 +235,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" for="producto_id">Producto</span>
                                         </div>
-                                        <select class="custom-select custom-select-sm select2 select2bs4" id="producto_id"  name="producto_id" onchange="fn_trae_descripcion(); return false;">
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="producto_id"  name="producto_id" onchange="fn_trae_descripcion(); return false;" required>
                                             <option value="">Seleccionar...</option>
                                             @foreach($productos as $p)
                                                 <option value="{{ $p->id}}">{{ $p->descripcion}}</option>
@@ -256,7 +257,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Cantidad</span>
                                     </div>
-                                    <input type="number" class="form-control" id="cantidad" name="cantidad" onchange="fn_precio_total(); return false;" style="text-align: right;">
+                                    <input type="number" class="form-control" id="cantidad" name="cantidad" onchange="fn_precio_total(); return false;" style="text-align: right;" value="1" required>
                                 </div>
                             </div>
                             <div class="row">
@@ -264,7 +265,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Prc. Unitario</span>
                                     </div>
-                                    <input type="number" class="form-control" id="precio_unitario" name="precio_unitario" onchange="fn_precio_total(); return false;" style="text-align: right;">
+                                    <input type="number" class="form-control" id="precio_unitario" name="precio_unitario" onchange="fn_precio_total(); return false;" style="text-align: right;" required>
                                 </div>
                             </div>
                             <div class="row">
@@ -277,7 +278,7 @@
                             </div>
                         </div>
                     </div>
-                <!--</div>-->
+                </form>
             </div>
         </div>
     </div>
@@ -286,116 +287,114 @@
     <div class="modal fade" id="fpagoModal" tabindex="-1" role="dialog" aria-labelledby="mensajeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="card card-navy">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-9">
-                                Forma de Pago
+                <form class="form-horizontal" id="fpagoForm" name="fpagoForm" action="#">
+                    <div class="card card-navy">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    Forma de Pago
+                                </div>
+                                <div class="col-md-3" style="text-align: right;">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Grabar"><i class="fas fa-save"></i></button>
+                                    <!--<a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_fpago_local(); return false;"><i class="fas fa-save"></i></a>-->
+                                    <!--<button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" title="Salir"><i class="fas fa-sign-out-alt"></i></button>-->
+                                    <button type="button" class="btn btn-sm btn-danger" title="Salir" onclick="cerrar_modal('fpagoModal'); return false;"><i class="fas fa-sign-out-alt"></i></button>
+                                </div>
                             </div>
-                            <div class="col-md-3" style="text-align: right;">
-                                <a href="#" class="btn btn-sm btn-success" title="Grabar" onclick="fn_fpago_local(); return false;"><i class="fas fa-save"></i></a>
-                                <!--<button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" title="Salir"><i class="fas fa-sign-out-alt"></i></button>-->
-                                <button type="button" class="btn btn-sm btn-danger" title="Salir" onclick="cerrar_modal('fpagoModal'); return false;"><i class="fas fa-sign-out-alt"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div id="fpago" class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="fpago_id">Forma de pago</label>
+                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="fpago_id"  name="fpago_id" onchange="verifica_campos(); return false;" required>
+                                            <option value="" selected>Seleccionar...</option>
+                                            @foreach($formas_pago as $fp)
+                                                <option value="{{ $fp->id}}">{{ $fp->descripcion }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="banco" class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="banco_id">Banco</label>
+                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="banco_id"  name="banco_id">
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($bancos as $b)
+                                                <option value="{{ $b->id}}">{{ $b->nombre}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="tarjeta1" class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="tarjeta_id">Tarjeta</label>
+                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="tarjeta_id"  name="tarjeta_id">
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($tarjetas as $t)
+                                                <option value="{{ $t->id}}">{{ $t->nombre}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="recibos_con_saldo" class="row">
+                                <div class="col-md-10 offset-md-1 mb-1">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="tarjeta_id">Recibo</label>
+                                        </div>
+                                        <select class="custom-select custom-select-sm select2 select2bs4" id="recibo_id"  name="recibo_id">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cuenta" class="row">
+                                <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">No. Cuenta</label>
+                                    </div>
+                                    <input type="text" class="form-control" id="cuenta_no" name="cuenta_no" value="{{ old('cuenta_no')}}">
+                                </div>
+                            </div>
+                            <div id="documento" class="row">
+                                <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">No. Documento</label>
+                                    </div>
+                                    <input type="text" class="form-control" id="documento_no" name="documento_no" value="{{ old('documento_no')}}">
+                                </div>
+                            </div>
+                            <div id="autorizacion" class="row">
+                                <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">No. Autorización</label>
+                                    </div>
+                                    <input type="text" class="form-control" id="autoriza_no" name="autoriza_no" value="{{ old('autoriza_no')}}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text">Monto</label>
+                                    </div>
+                                    <input type="number" class="form-control" id="monto" name="monto" value="{{ old('monto')}}" style="text-align: right;" autofocus required>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <!--<div class="row">
-                            <div class="col-md-10 offset-md-1 text-center">
-                                <div class="form-group form-control-sm clearfix">
-                                    <div class="icheck-primary d-inline">
-                                        <input type="radio" id="efectivo" name="fpago" value="E" checked>
-                                        <label for="efectivo">Efectivo</label>
-                                    </div>
-                                    <div class="icheck-primary d-inline">
-                                        <input type="radio" id="cheque" name="fpago" value="B" tabindex="9">
-                                        <label for="cheque">Cheque</label>
-                                    </div>
-                                    <div class="icheck-primary d-inline">
-                                        <input type="radio" id="tarjeta" name="fpago" value="T" tabindex="9">
-                                        <label for="tarjeta">Tarjeta</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-                        <div id="fpago" class="row">
-                            <div class="col-md-10 offset-md-1 mb-1">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="fpago_id">Forma de pago</span>
-                                    </div>
-                                    <select class="custom-select custom-select-sm select2 select2bs4" id="fpago_id"  name="fpago_id" onchange="fn_actualizarCampos(); return false;">
-                                        @foreach($formas_pago as $fp)
-                                            <option value="{{ $fp->id}}">{{ $fp->descripcion }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="banco" class="row">
-                            <div class="col-md-10 offset-md-1 mb-1">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="banco_id">Banco</span>
-                                    </div>
-                                    <select class="custom-select custom-select-sm select2 select2bs4" id="banco_id"  name="banco_id">
-                                        <option value="">Seleccionar...</option>
-                                        @foreach($bancos as $b)
-                                            <option value="{{ $b->id}}">{{ $b->nombre}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="tarjeta1" class="row">
-                            <div class="col-md-10 offset-md-1 mb-1">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="tarjeta_id">Tarjeta</span>
-                                    </div>
-                                    <select class="custom-select custom-select-sm select2 select2bs4" id="tarjeta_id"  name="tarjeta_id">
-                                        <option value="">Seleccionar...</option>
-                                        @foreach($tarjetas as $t)
-                                            <option value="{{ $t->id}}">{{ $t->nombre}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="cuenta" class="row">
-                            <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">No. Cuenta</span>
-                                </div>
-                                <input type="text" class="form-control" id="cuenta_no" name="cuenta_no" value="{{ old('cuenta_no')}}">
-                            </div>
-                        </div>
-                        <div id="documento" class="row">
-                            <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">No. Documento</span>
-                                </div>
-                                <input type="text" class="form-control" id="documento_no" name="documento_no" value="{{ old('documento_no')}}">
-                            </div>
-                        </div>
-                        <div id="autorizacion" class="row">
-                            <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">No. Autorización</span>
-                                </div>
-                                <input type="text" class="form-control" id="autoriza_no" name="autoriza_no" value="{{ old('autoriza_no')}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="input-group mb-1 input-group-sm col-md-10 offset-md-1">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Monto</span>
-                                </div>
-                                <input type="number" class="form-control" id="monto" name="monto" value="{{ old('monto')}}" style="text-align: right;" autofocus>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -423,59 +422,20 @@
             });
         });
 
-        $("input[name=condicion]").click(function () {    
-            condicion = $(this).val();
+        $(function(){
+            $("#fpagoForm").submit(function(){
+                fn_fpago_local();
+                return false;
+            })
         });
-        /*$("input[name=fpago]").click(function () {    
-            forma_pago = $(this).val();
-            if (forma_pago == 'E') {
-                 $("#banco").hide();
-                 $("#cuenta").hide();
-                 $("#tarjeta1").hide();
-                 $("#documento").hide();
-                 $("#autorizacion").hide();
-            }
-            if (forma_pago == 'B') {
-                 $("#banco").show();
-                 $("#cuenta").show();
-                 $("#tarjeta1").hide();
-                 $("#documento").show();
-                 $("#autorizacion").show();
-            }
-            if (forma_pago == 'T') {
-                 $("#banco").hide();
-                 $("#cuenta").hide();
-                 $("#tarjeta1").show();
-                 $("#documento").show();
-                 $("#autorizacion").show();
-            }
-        });*/
 
-        function fn_actualizarCampos(){
-            fpago = document.getElementById('fpago_id').value;
-            forma_pago = fpago;
-            if (fpago == 1) {
-                $("#banco").hide();
-                $("#cuenta").hide();
-                $("#tarjeta1").hide();
-                $("#documento").hide();
-                $("#autorizacion").hide();    
-            }
-            if (fpago == 2) {
-                $("#banco").show();
-                $("#cuenta").show();
-                $("#tarjeta1").hide();
-                $("#documento").show();
-                $("#autorizacion").show();   
-            }
-            if (fpago == 3) {
-                $("#banco").hide();
-                $("#cuenta").hide();
-                $("#tarjeta1").show();
-                $("#documento").show();
-                $("#autorizacion").show();
-            }
-        }
+        $(function(){
+            $("#cargoForm").submit(function(){
+                fn_grabar_local();
+                return false;
+            })
+        });
+
 
         function fn_paciente_facturacion(){
             var paciente_id = document.getElementById('paciente_id').value;
@@ -499,15 +459,119 @@
         }
 
         function fn_forma_pago(){
-            document.getElementById('fpago_id').selectedIndex = 0;
+            document.getElementById('fpago_id').value     = '';
             $('#fpago_id').change();
+            document.getElementById('banco_id').value     = '';
+            document.getElementById('cuenta_no').value    = '';
+            document.getElementById('documento_no').value = '';
+            document.getElementById('autoriza_no').value  = '';
+            document.getElementById('monto').value        = '';
+            document.getElementById('recibo_id').value    = '';
+            $('#recibo_id').change();
             $("#banco").hide();
             $("#cuenta").hide();
             $("#tarjeta1").hide();
+            $("#recibos_con_saldo").hide();
             $("#documento").hide();
             $("#autorizacion").hide();
+            $("#monto").prop('disabled', false);
             $("#fpagoModal").modal('show');
         }
+
+        function verifica_campos(){
+            var fpago_id = document.getElementById('fpago_id').value;
+            var paciente_id = document.getElementById('paciente_id').value;
+            if (fpago_id != '') {
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('campos_requeridos')}}",
+                    method: "POST",
+                    data: { fpago_id  : fpago_id},
+                    success: function(response){
+                        $("#banco").hide();
+                        $("#cuenta").hide();
+                        $("#tarjeta1").hide();
+                        $("#documento").hide();
+                        $("#autorizacion").hide();
+                        $("#recibos_con_saldo").hide();
+                        $('#banco_id').prop("required", false);
+                        $("#cuenta_no").prop('required', false);
+                        $("#documento_no").prop('required', false);
+                        $("#autoriza_no").prop('required', false);
+                        $("#recibo_id").prop('required', false);
+                        $("#monto").prop('disabled', false);
+                        if (response.banco == 'S') {
+                            $("#banco").show();
+                            $('#banco_id').prop("required", true);
+                        }
+                        if (response.casa == 'S') {
+                            $("#tarjeta1").show();
+                            $("#tarjeta_id").prop('required', true);
+                        }
+                        if (response.cuenta == 'S') {
+                            $("#cuenta").show();
+                            $('#cuenta_no').prop("required", true);
+                        }
+                        if (response.documento == 'S') {
+                            $("#documento").show();
+                            $("#documento_no").prop('required', true);
+                        }
+                        if (response.autorizacion == 'S') {
+                            $("#autorizacion").show();
+                            $("#autoriza_no").prop('required', true);
+                        }
+                        if (response.recibos == 'S') {
+                            $("#recibos_con_saldo").show();
+                            $("#recibo_id").prop('required', true);
+                            $("#monto").prop('disabled', true);
+                            $.ajax({
+                                headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                url: "{{route('recibos_con_saldo')}}",
+                                method: "POST",
+                                data: { paciente_id  : paciente_id},
+                                success: function(response){
+                                    var html = '<option value="" >Seleccionar...</option>';
+                                    for (var i = 0; i < response.length; i++) {
+                                        html += '<option value="'+response[i]['id']+'" >'+response[i]['serie']+'-'+response[i]['correlativo']+'</option>';
+                                        $('#recibo_id').html(html);
+                                    }
+                                },
+                                error: function(error){
+                                    console.log(error);
+                                }
+                            });
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            }
+        }
+
+        $("#recibo_id").change(function(){
+            var recibo_id = document.getElementById('recibo_id').value;
+            if (recibo_id != '') {
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('trae_saldo_x_recibo')}}",
+                    method: "POST",
+                    data: { recibo_id  : recibo_id},
+                    success: function(response){
+                        document.getElementById('monto').value = parseFloat(response.total);
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            }
+        });
 
         window.addEventListener('load', function(){
             var local_db = [];
@@ -816,6 +880,8 @@
         }
 
         function fn_fpago_local(){
+            forma_pago = document.getElementById('fpago_id').value;
+            var recibo_id = 0;
             if (forma_pago == 1) {
                 var entidad_id            = null;
                 var entidad_descripcion   = '';
@@ -845,31 +911,85 @@
                 var monto         = document.getElementById('monto').value;
                 var formapago_descripcion = 'Tarjeta';
             }
-
-            var linea = {
-                id               : nlineaPago,
-                forma_pago       : forma_pago,
-                formapago_descripcion : formapago_descripcion,
-                entidad_id            : entidad_id,
-                entidad_descripcion   : entidad_descripcion,
-                cuenta_no        : cuenta_no,
-                documento_no     : documento_no,
-                autoriza_no      : autoriza_no,
-                monto            : monto
-            };
-
-            if(!localStorage.pago_db){
-                localStorage.pago_db = JSON.stringify([linea]);
+            if (forma_pago == 4) {
+                var entidad_id            = null;
+                var entidad_descripcion   = '';
+                var cuenta_no             = '';
+                var documento_no          = document.getElementById('documento_no').value;
+                var autoriza_no           = '';
+                var monto                 = document.getElementById('monto').value;
+                var formapago_descripcion = 'Transferencia Bancaria';
             }
-            else{
-                pago_db = JSON.parse(localStorage.pago_db);
-                pago_db.push(linea);
-                localStorage.pago_db = JSON.stringify(pago_db);
-            }
-            actualizarTablaPago();
-            $('#fpagoModal').modal('hide');
+            if (forma_pago == 5) {
+                var recibo = document.getElementById('recibo_id');
+                var recibo_id = recibo.options[recibo.selectedIndex].value;
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('forma_pago_recibo')}}",
+                    method: "POST",
+                    data: { recibo_id  : recibo_id},
+                    success: function(response){
+                        for (var i = 0; i < response.length; i++) {
+                            var linea = {
+                                id                    : nlineaPago,
+                                forma_pago            : response[i]['forma_pago'],
+                                formapago_descripcion : response[i]['descripcion'],
+                                entidad_id            : response[i]['banco_id'],
+                                entidad_descripcion   : response[i]['nombre'],
+                                recibo_id             : response[i]['maestro_pago_id'],
+                                cuenta_no             : response[i]['cuenta_no'],
+                                documento_no          : response[i]['documento_no'],
+                                autoriza_no           : response[i]['autoriza_no'],
+                                monto                 : response[i]['monto']
+                            }
 
-            nlineaPago += 1;
+                            if(!localStorage.pago_db){
+                                localStorage.pago_db = JSON.stringify([linea]);
+                            }
+                            else{
+                                pago_db = JSON.parse(localStorage.pago_db);
+                                pago_db.push(linea);
+                                localStorage.pago_db = JSON.stringify(pago_db);
+                            }
+                            actualizarTablaPago();
+                            $('#fpagoModal').modal('hide');
+                            nlineaPago += 1;
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            }
+
+            if (forma_pago != 5) {
+                var linea = {
+                    id               : nlineaPago,
+                    forma_pago       : forma_pago,
+                    formapago_descripcion : formapago_descripcion,
+                    entidad_id            : entidad_id,
+                    entidad_descripcion   : entidad_descripcion,
+                    recibo_id        : 0,
+                    cuenta_no        : cuenta_no,
+                    documento_no     : documento_no,
+                    autoriza_no      : autoriza_no,
+                    monto            : monto
+                };
+
+                if(!localStorage.pago_db){
+                    localStorage.pago_db = JSON.stringify([linea]);
+                }
+                else{
+                    pago_db = JSON.parse(localStorage.pago_db);
+                    pago_db.push(linea);
+                    localStorage.pago_db = JSON.stringify(pago_db);
+                }
+                actualizarTablaPago();
+                $('#fpagoModal').modal('hide');
+                nlineaPago += 1;
+                }
         }
 
         function fn_grabar_factura(){
@@ -887,10 +1007,6 @@
             var direccion         = document.getElementById('direccion').value;
             error = false;
             checkSubmit();
-
-            /*for (var i = 0; i < local_db.length; i++) {
-                console.log(local_db[i]['descripcion']);
-            }*/
 
             if (!error && local_db.length > 0) {
                 $.ajax({
@@ -911,7 +1027,7 @@
                             nombre            : nombre,
                             direccion         : direccion,
                             admision_id       : admision_id,
-                            paciente_id       : paciente_id,
+                            paciente_id       : paciente_id
                     },
                     success: function(response){
                         var info = response;

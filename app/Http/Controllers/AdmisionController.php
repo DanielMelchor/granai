@@ -311,7 +311,7 @@ class AdmisionController extends Controller
             $cargo = new admision_cargo();
             $cargo->admision_id = $admision_id;
             $cargo->producto_id = intval($dataAgregar[$i]['producto_id']);
-            $cargo->descripcion = $dataAgregar[$i]['producto_descripcion'];
+            $cargo->descripcion = $dataAgregar[$i]['cargo_descripcion'];
             $cargo->cantidad    = floatval($dataAgregar[$i]['cantidad']);
             $cargo->precio_unitario = floatval($dataAgregar[$i]['precio_unitario']);
             $cargo->precio_total    = floatval($dataAgregar[$i]['precio_total']);
@@ -921,7 +921,7 @@ class AdmisionController extends Controller
                             ->from('detalle_documentos as dd')
                             ->whereRaw('dd.admision_cargo_detalle_id = acd.id');
                   })
-                  ->select('ac.producto_id','p.descripcion as producto_descripcion','ac.cantidad', 'ac.descripcion', 'acd.valor', 'acd.id as cargo_detalle_id')
+                  ->select('ac.producto_id','ac.descripcion as producto_descripcion','ac.cantidad', 'ac.descripcion', 'acd.valor', 'acd.id as cargo_detalle_id')
                   ->get();
         $respuesta = array('encabezado' => $encabezado, 'cargos' => $cargos);
         return response::json($respuesta);

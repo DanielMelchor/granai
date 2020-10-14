@@ -357,7 +357,6 @@
 		            console.log(error);
 		        }
 			});
-			//return window.location.href = "{{route('inicio')}}/agenda/nueva_agenda/"+medico+"/"+estado+"/"+fecha;
 		}
 
 		function zeroPad(num, numZeros) { 

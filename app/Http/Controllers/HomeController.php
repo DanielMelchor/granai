@@ -12,9 +12,13 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    /*public function __construct()
     {
         $this->middleware('auth');
+    }*/
+
+    public function welcome(){
+        return view('welcome');
     }
 
     /**
@@ -24,8 +28,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        //return view('nueva_agenda');
-        //return view('welcome');
         return view('home');
     }
 
@@ -109,6 +111,7 @@ class HomeController extends Controller
     public function logout()
     {
         Auth::logout();
-        return view('auth.login');
+        //return view('auth.login');
+        return view('welcome');
     }
 }
