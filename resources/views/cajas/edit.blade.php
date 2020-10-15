@@ -631,9 +631,6 @@
 	                        function(){
 	                        	location.reload();
 	                        });
-	                    /*$('.modal_texto').html(info.respuesta);
-	                    $("#mensajeModal").modal('show');*/
-	                    /*return window.location.href = "{{route('inicio')}}/cajas/editar/"+info.caja_id;*/
 	                },
 	                error: function(error){
 	                    console.log(error);
