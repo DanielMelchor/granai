@@ -133,7 +133,11 @@
     	var fecha_inicial = document.getElementById('fecha_inicio').value;
     	var fecha_final   = document.getElementById('fecha_final').value;
     	if(fecha_inicial == '' || fecha_final == '') return false;
-		return window.location.href = "{{route('inicio')}}/reportes/admision_consultas/"+fecha_inicial+"/"+fecha_final;
+			var url = "{{ route('rpt_admisiones_con_saldo', ['fecha_inicial' => '2020-01-01', 'fecha_final' => '2020-01-02', 'tipo_admision' => 'T']) }}";
+    		url = url.replace('2020-01-01', fecha_inicial);
+    		url = url.replace('2020-01-02', fecha_final);
+    		url = url.replace('T', tipo_admision);
+    		location.href = url;
     }
 	</script>
 @endsection

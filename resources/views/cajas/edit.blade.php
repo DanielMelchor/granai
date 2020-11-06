@@ -30,7 +30,6 @@
 			<div class="card-header">
 				<div class="col-md-2 offset-md-10" style="text-align: right;">
 					<button type="button" onclick="fn_grabar_caja(); return false;" class="btn btn-sm btn-success" title="Grabar"><i class="fas fa-save"></i></button>
-					<!--<a href="{{route('cajas')}}" class="btn btn-sm btn-danger" title="Regresar a lista de Cajas"><i class="fas fa-sign-out-alt"></i></a>	-->
 					<a href="#" class="btn btn-sm btn-danger" title="Regresar a lista de Pacientes" onclick="confirma_salida(); return false;"><i class="fas fa-sign-out-alt"></i></a>
 				</div>
 			</div>

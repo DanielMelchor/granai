@@ -255,6 +255,18 @@
             	document.getElementById('nombre_completo').value = '';
             }else{
             	document.getElementById('nombre_completo').value = paciente_nombre;
+            	$.ajax({
+            		url: "{{ route('trae_telefonos_x_paciente') }}",
+			        type: "POST",
+			        dataType: 'json',
+			        data: {"_token": "{{ csrf_token() }}",paciente_id : paciente_id},
+			        success: function(response){
+			        	document.getElementById('telefonos').value = response.telefonos;
+			        },
+			        error: function(error){
+			            console.log(error);
+			        }
+            	});
             }
 		}
 

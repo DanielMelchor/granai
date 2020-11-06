@@ -136,7 +136,7 @@
                                     <table id="tblrecibos" class="table table-sm table-striped table-hover">
                                         <thead>
                                             <tr class="text-center">
-                                                <th>Recibo</th><th>Tipo</th><th>Admision</th><th>Paciente</th><th>Total</th><th>Efectivo</th><th>Cheque</th><th>Tarjeta</th>
+                                                <th>Recibo</th><th>Tipo</th><th>Admision</th><th>Paciente</th><th>Total</th><th>Efectivo</th><th>Cheque</th><th>Transferencia</th><th>Tarjeta</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -316,6 +316,9 @@
                         html += '</td>'
                         html += '<td style="text-align: right;">'
                         html += info[i]['cheque']
+                        html += '</td>'
+                        html += '<td style="text-align: right;">'
+                        html += info[i]['transferencia']
                         html += '</td>'
                         html += '<td style="text-align: right;">'
                         html += info[i]['tarjeta']

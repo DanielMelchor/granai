@@ -144,10 +144,15 @@
     	var fecha_inicial = document.getElementById('fecha_inicio').value;
     	var fecha_final   = document.getElementById('fecha_final').value;
     	var tipo_admision = document.getElementById('tipo_admision').value;
+    	alert(fecha_inicial);
 
     	if(fecha_inicial == '' || fecha_final == '') return false;
-		/*return window.location.href = "{{route('inicio')}}/reportes/admisiones_activas/"+fecha_inicial+"/"+fecha_final+"/"+tipo_admision;*/
-		window.location.href = "{{ route('rpt_admisiones_activas',["+fecha_inicial+","+fecha_final+", 'T']) }}";
+    	var url = "{{ route('rpt_admisiones_activas', ['fecha_inicial' => '2020-01-01', 'fecha_final' => '2020-01-02', 'tipo_admision' => 'T']) }}";
+    	url = url.replace('2020-01-01', fecha_inicial);
+    	url = url.replace('2020-01-02', fecha_final);
+    	url = url.replace('T', tipo_admision);
+    	location.href = url;
+		/*window.location.href = "{{ route('rpt_admisiones_activas',["+fecha_inicial+","+fecha_final+", 'T']) }}";*/
     }
 	</script>
 @endsection

@@ -912,8 +912,9 @@
                 var formapago_descripcion = 'Tarjeta';
             }
             if (forma_pago == 4) {
-                var entidad_id            = null;
-                var entidad_descripcion   = '';
+                var banco        = document.getElementById('banco_id');
+                var entidad_id   = banco.options[banco.selectedIndex].value;
+                var entidad_descripcion = banco.options[banco.selectedIndex].text;
                 var cuenta_no             = '';
                 var documento_no          = document.getElementById('documento_no').value;
                 var autoriza_no           = '';

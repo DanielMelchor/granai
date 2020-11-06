@@ -122,7 +122,7 @@
               <a id="reportesSubMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle"><i class="fas fa-file-alt"></i> Reportes</a>
               <ul aria-labelledby="reportesSubMenu" class="dropdown-menu border-0 shadow">
                 <li><a href="{{ route('rpt_admisiones_activas',[date('Y-m-d'),date('Y-m-d'), 'T']) }}" class="dropdown-item">Admisiones Activas</a></li>
-                <li><a href="{{ route('rpt_admisiones_con_saldo') }}" class="dropdown-item">Admisiones con Saldo</a></li>
+                <li><a href="{{ route('rpt_admisiones_con_saldo',[date('Y-m-d'),date('Y-m-d'), 'T']) }}" class="dropdown-item">Admisiones con Saldo</a></li>
                 <li><a href="{{ route('rpt_admisiones_por_fecha',['T', date('Y-m-d'), date('Y-m-d')]) }}" class="dropdown-item">Admisiones por Fecha</a></li>
                 <li><a href="{{ route('rpt_admision_consultas',[date('Y-m-d'),date('Y-m-d')]) }}" class="dropdown-item">Consultas</a></li>
                 <li><a href="{{ route('rpt_admision_hospitalizacion',[date('Y-m-d'),date('Y-m-d')]) }}" class="dropdown-item">Hospitalizaciones</a></li>

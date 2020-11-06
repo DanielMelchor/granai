@@ -258,6 +258,7 @@ Route::group(['prefix' => 'pacientes'], function () {
 	Route::get('consultas/{paciente_id}', 'pacienteController@consultas')->name('paciente_consultas');
 	Route::post('datos_facturacion','pacienteController@trae_datos_facturacion')->name('datos_facturacion');
 	Route::post('verificar_expediente','pacienteController@verifica_expediente')->name('verificar_expediente');
+	Route::post('trae_telefonos_x_paciente', 'pacienteController@get_telefono_x_paciente')->name('trae_telefonos_x_paciente');
 });
 
 Route::group(['prefix' => 'permissions'], function(){
@@ -293,7 +294,8 @@ Route::group(['prefix' => 'reportes'], function(){
 	Route::get('antiguedad_saldos', 'ReporteController@antiguedad_saldos_idx')->name('rpt_antiguedad_saldos');
 	Route::get('antiguedad_saldos_pdf', 'ReporteController@antiguedad_saldos_pdf')->name('rpt_antiguedad_saldos_pdf');
 	Route::get('antiguedad_saldos_xls', 'ReporteController@antiguedad_saldos_xls')->name('rpt_antiguedad_saldos_xls');
-	Route::get('admisiones_con_saldo', 'ReporteController@admisiones_con_saldo_idx')->name('rpt_admisiones_con_saldo');
+	Route::get('admisiones_con_saldo/{fecha_inicial}/{fecha_final}/{tipo_admision}', 'ReporteController@admisiones_con_saldo_idx')->name('rpt_admisiones_con_saldo');
+	
 	Route::get('admisiones_con_saldo_pdf', 'ReporteController@admisiones_con_saldo_pdf')->name('rpt_admisiones_con_saldo_pdf');
 	Route::get('admisiones_con_saldo_xls', 'ReporteController@admisiones_con_saldo_xls')->name('rpt_admisiones_con_saldo_xls');
 	Route::get('admisiones_por_fecha/{tipo_admision}/{fecha_inicial}/{fecha_final}', 'ReporteController@admisiones_por_fecha_idx')->name('rpt_admisiones_por_fecha');
@@ -317,6 +319,8 @@ Route::group(['prefix' => 'reportes'], function(){
 	Route::get('anulaciones/{fecha_inicial}/{fecha_final}', 'ReporteController@rpt_anulaciones_idx')->name('rpt_anulaciones');
 	Route::get('anulaciones_pdf/{fecha_inicial}/{fecha_final}', 'ReporteController@rpt_anulaciones_pdf')->name('rpt_anulaciones_pdf');
 	Route::get('anulaciones_xls/{fecha_inicial}/{fecha_final}', 'ReporteController@rpt_anulaciones_xls')->name('rpt_anulaciones_xls');
+	Route::get('rpt_arqueo_pdf/{corte_id}', 'ReporteController@rpt_arqueo_pdf')->name('rpt_arqueo_pdf');
+	Route::get('rpt_arqueo_xls/{corte_id}', 'ReporteController@rpt_arqueo_xls')->name('rpt_arqueo_xls');
 });
 
 Route::group(['prefix' => 'roles'], function(){

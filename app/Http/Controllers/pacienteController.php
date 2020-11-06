@@ -342,4 +342,10 @@ class PacienteController extends Controller
         $existe = Paciente::where('expediente_no', $expediente_no)->count();
         return Response::json($existe);
     }
+
+    public function get_telefono_x_paciente(){
+        $paciente_id = $_POST['paciente_id'];
+        $complemento = Paciente::findOrFail($paciente_id);
+        return Response::json($complemento);
+    }
 }

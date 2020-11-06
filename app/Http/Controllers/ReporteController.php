@@ -13,6 +13,7 @@ use App\Exports\AntiguedadSaldosExport;
 use App\Exports\AdmisionesConSaldoExport;
 use App\Exports\AdmisionesPorFechaExport;
 use App\Exports\variosExport;
+use App\Exports\ArqueoExport;
 use DB;
 use Auth;
 use PDF;
@@ -1111,5 +1112,48 @@ class ReporteController extends Controller
       $pdf->setPaper('letter','portrait');
       $nombre_informe = 'impresion_factura.pdf';
       return $pdf->stream($nombre_informe);
+    }
+
+    public function rpt_arqueo_pdf($id){
+      $empresa = empresa::findOrFail(Auth::user()->empresa_id);      
+      $corte = DB::table('cortes as co')
+               ->join('cajas as ca', 'co.caja_id', 'ca.id')
+               ->select('ca.nombre_maquina', 'co.corte', 'co.fecha as fecha')
+               ->first();
+
+      $pagos = DB::table('vw_corte_caja_recibos as vvcr')
+               ->where('vvcr.empresa_id', Auth::user()->empresa_id)
+               ->where('vvcr.corte_id', $id)
+               ->get();
+
+      $documentos = DB::table('vw_venta_documentos as vvd')
+                    ->where('vvd.empresa_id', Auth::user()->empresa_id)
+                    ->where('vvd.corte_id', $id)
+                    ->select('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre',DB::raw('SUM(vvd.total_documento) as total_documento'))
+                    ->groupBy('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre')
+                    ->get();
+
+      //return view('reportes.rpt_arqueo_pdf', compact('empresa', 'corte', 'pagos','documentos'));
+      ini_set('memory_limit', '-1');
+      $pdf = PDF::loadView('reportes.rpt_arqueo_pdf', compact('empresa', 'corte', 'pagos','documentos'));
+      $pdf->setPaper('letter','landscape');
+      $nombre_informe = 'arqueo_de_caja.pdf';
+      return $pdf->stream($nombre_informe);
+    }
+
+    public function rpt_arqueo_xls($id){
+      $pagos = DB::table('vw_corte_caja_recibos as vvcr')
+               ->where('vvcr.empresa_id', Auth::user()->empresa_id)
+               ->where('vvcr.corte_id', $id)
+               ->select('fecha_emision', 'serie', 'correlativo', 'nombre_completo', 'total_recibo', 'Efectivo', 'Cheque', 'Tarjeta', 'Transferencia', 'tipo_admision', 'admision', 'corte_id')
+               ->get();
+
+      $documentos = DB::table('vw_venta_documentos as vvd')
+                    ->where('vvd.empresa_id', Auth::user()->empresa_id)
+                    ->where('vvd.corte_id', $id)
+                    ->select('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre',DB::raw('SUM(vvd.total_documento) as total_documento'))
+                    ->groupBy('vvd.tipodocumento_descripcion', 'vvd.serie', 'vvd.correlativo', 'vvd.fecha_emision', 'vvd.nit', 'vvd.nombre')
+                    ->get();
+
     }
 }

@@ -151,10 +151,10 @@ class ventaController extends Controller
                 ->join('pago_documentos as pd', 'md.id', 'pd.maestro_documento_id')
                 ->leftjoin('maestro_pagos as mp', 'pd.maestro_pago_id', 'mp.id')
                 ->leftjoin('detalle_pagos as dp', 'mp.id', 'dp.maestro_pago_id')
+                ->leftjoin('formas_pago as fp', 'dp.forma_pago', 'fp.id')
                 ->leftjoin('bancos as b', 'dp.banco_id', 'b.id')
                 ->where('md.id', $id)
-                ->select(DB::raw('(CASE dp.forma_pago when "E" then "Efectivo" when "B" then "Cheque" else "Tarjeta" end) as forma_pago'), 'b.nombre as entidad_nombre', 'dp.cuenta_no', 'dp.documento_no', 'dp.autoriza_no', 'dp.monto')
-                ->groupBy(DB::raw('(CASE dp.forma_pago when "E" then "Efectivo" when "B" then "Cheque" else "Tarjeta" end)'), 'b.nombre', 'dp.cuenta_no', 'dp.documento_no', 'dp.autoriza_no', 'dp.monto')
+                ->select('fp.descripcion as forma_pago', 'b.nombre as entidad_nombre', 'dp.cuenta_no', 'dp.documento_no', 'dp.autoriza_no', 'dp.monto')
                 ->get();
         return view('ventas.factura_edit', compact('documento', 'encabezado', 'detalle', 'admision_id', 'listado', 'pacientes', 'pago', 'caja', 'hoy'));
     }
@@ -1044,7 +1044,7 @@ class ventaController extends Controller
                    ->where('vccr.caja_id', $caja_id)
                    ->whereDate('vccr.fecha_emision', $fecha)
                    ->where('vccr.corte_id',null)
-                   ->select('serie', 'correlativo', 'tipo_admision', 'admision', 'nombre_completo', 'total_recibo', 'efectivo', 'cheque', 'tarjeta')
+                   ->select('serie', 'correlativo', 'tipo_admision', 'admision', 'nombre_completo', 'total_recibo', 'efectivo', 'cheque', 'tarjeta', 'transferencia')
                    ->get();
         return Response::json($detalle);
     }
@@ -1114,6 +1114,12 @@ class ventaController extends Controller
                     ->get();
         //dd($resumenp);
 
+        $totalresumenp = DB::table('vw_forma_pago_documentos as vfpd')
+                         ->where('vfpd.empresa_id', Auth::user()->empresa_id)
+                         ->where('vfpd.corte_id', '=', $id)
+                         ->select(DB::raw('SUM(IFNULL(vfpd.total_forma_pago,0)) as total'))
+                         ->first();
+
         $documentos = DB::table('vw_venta_documentos as vvd')
                       ->where('vvd.empresa_id', Auth::user()->empresa_id)
                       ->where('vvd.corte_id', $id)
@@ -1126,8 +1132,8 @@ class ventaController extends Controller
                  ->where('vvcr.corte_id', $id)
                  ->get();
 
-        //dd($documentos);
+        //dd($totalresumenp);
 
-        return view('ventas.corte_edit', compact('corte', 'documentos', 'pagos', 'caja', 'resumend', 'resumenp', 'totalresumend'));
+        return view('ventas.corte_edit', compact('corte', 'documentos', 'pagos', 'caja', 'resumend', 'resumenp', 'totalresumend', 'totalresumenp'));
     }
 }

@@ -17,9 +17,9 @@ class AdmisionConsultasExport implements FromArray, WithTitle, ShouldAutoSize, W
 
     public function __construct($titulo,$headings,$data)
     {
-    	$this->titulo = $titulo;
+    	$this->titulo   = $titulo;
     	$this->headings = $headings;
-    	$this->data = $data;
+    	$this->data     = $data;
     }
 
     public function array(): array
