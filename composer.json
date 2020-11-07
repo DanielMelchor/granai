@@ -24,8 +24,7 @@
         "rap2hpoutre/laravel-log-viewer": "^1.6",
         "setasign/fpdf": "^1.8",
         "spatie/laravel-permission": "^3.11",
-        "wildside/userstamps": "^2.0",
-        "arielcr/numero-a-letras": "dev-master"
+        "wildside/userstamps": "^2.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
