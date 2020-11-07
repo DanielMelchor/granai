@@ -30,7 +30,7 @@ use App\vw_admision;
 use App\Medicamento;
 use App\medicamento_dosis;
 
-class PacienteController extends Controller
+class pacienteController extends Controller
 {
     public function __construct()
     {
